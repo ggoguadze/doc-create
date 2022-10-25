@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Rename to LegalEntity
+model Customer {
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
+  name           String?
+  legalAdress    String
+  deliveryAdress String
+  pvnCode        String
+  account        String
+  bankName       String
+  Order          Order[]
+}
+
+model Products {
+  id     Int     @id @default(autoincrement())
+  name   String
+  price  Float
+  orders Order[]
+}
+
+// TODO use person model instead of user and driver
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Driver {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Transport {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Order {
+  id             Int        @id @default(autoincrement())
+  dateCreated    DateTime
+  dateDelivered  DateTime
+  datePaymentDue DateTime
+  customer       Customer   @relation(fields: [customerId], references: [id])
+  products       Products[]
+  customerId     Int
+}
+
+// Add measurement units
+// Add products + quantity + price? + discounts? to order
