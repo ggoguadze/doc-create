@@ -14,7 +14,7 @@ generator client {
 model Customer {
   id             Int     @id @default(autoincrement())
   email          String  @unique
-  name           String?
+  clientName     String?
   legalAdress    String
   deliveryAdress String
   pvnCode        String
