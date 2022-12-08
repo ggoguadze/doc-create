@@ -21,9 +21,15 @@ export const getServerSideProps = async () => {
 function products({ products }: { products: Products[] }) {
     const [displayModal, setDisplayModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(0);
+    const [productEdit, setProductEdit] = useState<IProduct | undefined>(undefined);
 
     function toggleItemForm() {
         setDisplayModal(!displayModal);
+    }
+    function onEditCustomer() {
+        const product = products.find((product) => product.id === selectedProduct) as IProduct;
+        setProductEdit(product);
+        toggleItemForm();
     }
 
     const router = useRouter();
@@ -62,7 +68,7 @@ function products({ products }: { products: Products[] }) {
         <div>
             <span className="p-buttonset">
                 <Button onClick={toggleItemForm} label="Jauns" icon="pi pi-file" />
-                <Button onClick={toggleItemForm} label="Labot" icon="pi pi-pencil" />
+                <Button onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
                 <Button onClick={() => deleteProduct(selectedProduct)} label="Dzēst" icon="pi pi-trash" />
             </span>
             <DataTable
@@ -76,7 +82,7 @@ function products({ products }: { products: Products[] }) {
                 <Column field="price" header="Cena"></Column>
             </DataTable>
             <Dialog visible={displayModal} onHide={toggleItemForm}>
-                <ProductsEdit toggleItemForm={toggleItemForm} saveProduct={saveProduct} />
+                <ProductsEdit selectedData={productEdit} toggleItemForm={toggleItemForm} saveProduct={saveProduct} />
             </Dialog>
         </div>
     );

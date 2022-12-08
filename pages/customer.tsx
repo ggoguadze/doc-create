@@ -27,9 +27,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
 function clients({ customers }: { customers: Customer[] }) {
     const [displayModal, setDisplayModal] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(0);
+    const [customerEdit, setCustomerEdit] = useState<ICustomer | undefined>(undefined);
 
     function toggleItemForm() {
         setDisplayModal(!displayModal);
+    }
+
+    function onEditCustomer() {
+        const customer = customers.find((customer) => customer.id === selectedCustomer) as ICustomer;
+        setCustomerEdit(customer);
+        toggleItemForm();
     }
 
     const router = useRouter();
@@ -68,7 +75,7 @@ function clients({ customers }: { customers: Customer[] }) {
         <div>
             <span className="p-buttonset">
                 <Button onClick={toggleItemForm} label="Jauns" icon="pi pi-file" />
-                <Button onClick={toggleItemForm} label="Labot" icon="pi pi-pencil" />
+                <Button onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
                 <Button onClick={() => deleteCustomer(selectedCustomer)} label="Dzēst" icon="pi pi-trash" />
             </span>
 
@@ -88,7 +95,7 @@ function clients({ customers }: { customers: Customer[] }) {
                 <Column field="account" header="Konta numurs"></Column>
             </DataTable>
             <Dialog visible={displayModal} onHide={toggleItemForm}>
-                <CustomerEdit toggleItemForm={toggleItemForm} saveCustomer={saveCustomer} />
+                <CustomerEdit selectedData={customerEdit} toggleItemForm={toggleItemForm} saveCustomer={saveCustomer} />
             </Dialog>
         </div>
     );
