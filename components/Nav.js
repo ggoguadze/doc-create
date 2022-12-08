@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import navStyles from '../styles/Nav.module.css'
 
+import { useUser } from '@auth0/nextjs-auth0/client';
 const Nav = () => {
+    const { user, error, isLoading } = useUser();
     return (
         <nav className={navStyles.nav}>
-            <ul>
+            {user ? (<ul>
                 <li>
                     <Link href='/products'>Produkti</Link>
                 </li>
@@ -12,9 +14,15 @@ const Nav = () => {
                     <Link href='/customer'>Klienti</Link>
                 </li>
                 <li>
-                    <Link href= '/createDoc'>Veidot dokumentu</Link>
+                    <Link href='/otherData'>Citi dati</Link>
                 </li>
-            </ul>
+                <li>
+                    <Link href='/createDocument'>Veidot dokumentu</Link>
+                </li>
+                <li>
+                    <a className='logoutButton' href="/api/auth/logout">Izlogoties</a>
+                </li>
+            </ul>) : (<ul><li><a className='loginButton' href="/api/auth/login">Ielogoties</a></li></ul>)}
         </nav>
     )
 }

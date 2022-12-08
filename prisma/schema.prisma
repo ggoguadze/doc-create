@@ -42,8 +42,9 @@ model Driver {
 }
 
 model Transport {
-  id   Int    @id @default(autoincrement())
-  name String
+  id     Int    @id @default(autoincrement())
+  name   String
+  number String
 }
 
 model Order {
