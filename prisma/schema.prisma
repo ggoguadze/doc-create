@@ -20,14 +20,14 @@ model Customer {
   pvnCode        String
   account        String
   bankName       String
-  Order          Order[]
+  orders         Order[]
 }
 
 model Products {
-  id     Int     @id @default(autoincrement())
-  name   String
-  price  Float
-  orders Order[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  price Float
+  unit  String
 }
 
 // TODO use person model instead of user and driver
@@ -37,24 +37,38 @@ model User {
 }
 
 model Driver {
-  id   Int    @id @default(autoincrement())
-  name String
+  id     Int     @id @default(autoincrement())
+  name   String
+  orders Order[]
 }
 
 model Transport {
-  id     Int    @id @default(autoincrement())
+  id     Int     @id @default(autoincrement())
   name   String
   number String
+  orders Order[]
 }
 
 model Order {
-  id             Int        @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   dateCreated    DateTime
   dateDelivered  DateTime
   datePaymentDue DateTime
-  customer       Customer   @relation(fields: [customerId], references: [id])
-  products       Products[]
+  orderProducts  OrderProduct[]
+  customer       Customer       @relation(fields: [customerId], references: [id])
   customerId     Int
+  driver         Driver         @relation(fields: [driverId], references: [id])
+  driverId       Int
+  transport      Transport      @relation(fields: [transportId], references: [id])
+  transportId    Int
+  discount       Float
+}
+
+model OrderProduct {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  order    Order @relation(fields: [orderId], references: [id])
+  orderId  Int
 }
 
 // Add measurement units

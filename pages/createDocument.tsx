@@ -1,5 +1,4 @@
-import React from 'react'
-import { jsPDF } from "jspdf";
+import React from "react";
 
 interface IDocument {
     invoiceNumber: string;
@@ -22,28 +21,22 @@ function createDocument() {
         console.log("Sign document");
     }
 
-    function createPdf() {
-        const pdf = new jsPDF();
-        const documentData = document.querySelector("#testInvoice") as HTMLElement;
-        pdf.html(documentData, {
-            callback: function (pdf) {
-                //pdf.save("test.pdf");
-                signDocument()
-                setDocument(pdf.output("datauristring"));
-            },
-        });
-    }
-
+    function createPdf() {}
 
     return (
         <>
-            {doc ? <iframe src={doc} width="600px" height="1200px" /> : <><div id='testInvoice'>
-                <h1>Test invoice</h1>
-            </div>
-                <button onClick={createPdf}>CreatePDF</button></>
-            }
+            {doc ? (
+                <iframe src={doc} width="600px" height="1200px" />
+            ) : (
+                <>
+                    <div id="testInvoice">
+                        <h1>Test invoice</h1>
+                    </div>
+                    <button onClick={createPdf}>CreatePDF</button>
+                </>
+            )}
         </>
-    )
+    );
 }
 
-export default createDocument
+export default createDocument;
