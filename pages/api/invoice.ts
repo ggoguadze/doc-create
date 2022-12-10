@@ -1,6 +1,9 @@
 import { NextApiHandler } from 'next'
 const { chromium } = require('playwright')
 
+
+
+
 const Handler: NextApiHandler = async (req, res) => {
   const browser = await chromium.launch()
   const page = await browser.newPage()
@@ -14,3 +17,5 @@ const Handler: NextApiHandler = async (req, res) => {
 
   await browser.close()
 }
+
+export default Handler

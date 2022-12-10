@@ -120,6 +120,74 @@ const transportsData:Prisma.TransportCreateInput[] = [
     }
 ]
 
+const ordersData:Prisma.OrderCreateInput[] = [
+    {
+        dateCreated: new Date().toISOString(),
+        dateDelivered: new Date().toISOString(),
+        datePaymentDue: new Date().toISOString(),
+        customer:{
+            connect:{
+                id: 1
+            }
+        },
+        driver: {
+            connect:{
+                id: 1
+            }
+        },
+        transport: {
+            connect:{
+                id: 1
+            }
+        },
+        discount: 0,
+        documentType: 'INVOICE',
+        orderProducts: {
+            create: [
+                {
+                    quantity: 1,
+                    price: 1.5,
+                    productName: 'Kartupeļu krējums',
+                    unit: 'kg'
+                }
+            ],
+        },
+    },
+    {
+        dateCreated: new Date().toISOString(),
+        dateDelivered: new Date().toISOString(),
+        datePaymentDue: new Date().toISOString(),
+        customer:{
+            connect:{
+                id: 2
+            }
+        },
+        driver: {
+            connect:{
+                id: 2
+            }
+        },
+        transport: {
+            connect:{
+                id: 2
+            }
+        },
+        discount: 0,
+        documentType: 'INVOICE',
+        orderProducts: {
+            create: [
+                {
+                    
+                    quantity: 1,
+                    price: 2.5,
+                    productName: 'Pīrāgi',
+                    unit: 'kg'
+                }
+            ],
+        },
+    }
+]
+
 async function main() {
     console.log(`Start seeding ...`)
     for (const u of customersData) {
@@ -142,6 +210,12 @@ async function main() {
       }
       for (const u of transportsData) {
         const transport = await prisma.transport.create({
+          data: u,
+        })
+        console.log(`Created transport with id: ${transport.id}`)
+      }
+      for (const u of ordersData) {
+        const transport = await prisma.order.create({
           data: u,
         })
         console.log(`Created transport with id: ${transport.id}`)

@@ -14,7 +14,7 @@ generator client {
 model Customer {
   id             Int     @id @default(autoincrement())
   email          String  @unique
-  clientName     String?
+  clientName     String
   legalAdress    String
   deliveryAdress String
   pvnCode        String
@@ -51,9 +51,9 @@ model Transport {
 
 model Order {
   id             Int            @id @default(autoincrement())
-  dateCreated    DateTime
-  dateDelivered  DateTime
-  datePaymentDue DateTime
+  dateCreated    String
+  dateDelivered  String
+  datePaymentDue String
   orderProducts  OrderProduct[]
   customer       Customer       @relation(fields: [customerId], references: [id])
   customerId     Int
@@ -66,10 +66,13 @@ model Order {
 }
 
 model OrderProduct {
-  id       Int   @id @default(autoincrement())
-  quantity Int
-  order    Order @relation(fields: [orderId], references: [id])
-  orderId  Int
+  id          Int    @id @default(autoincrement())
+  quantity    Int
+  productName String
+  price       Float
+  unit        String
+  order       Order  @relation(fields: [orderId], references: [id])
+  orderId     Int
 }
 
 // Add measurement units
