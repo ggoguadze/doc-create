@@ -3,7 +3,8 @@ import navStyles from '../styles/Nav.module.css'
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 const Nav = () => {
-    const { user, error, isLoading } = useUser();
+    const { user } = useUser();
+    console.log(user)
     return (
         <nav className={navStyles.nav}>
             {user ? (<ul>

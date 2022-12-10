@@ -1,4 +1,4 @@
-function Invoice() {
+function invoiceDetail() {
     return (
         <div className="container">
             <div className="row">
@@ -112,5 +112,4 @@ function Invoice() {
         </div>
     );
 }
-
-export default Invoice;
+export default invoiceDetail

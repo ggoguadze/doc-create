@@ -1,6 +1,12 @@
-import React from "react";
+import { GetServerSideProps } from "next";
+import React, { useState } from "react";
+import { prisma } from "../prisma";
+import { Driver, Transport, Customer, Products } from "@prisma/client";
+import { useRouter } from "next/router";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 
-interface IDocument {
+interface IOrder {
     invoiceNumber: string;
     date: string;
     driver: string;
@@ -14,27 +20,65 @@ interface IDocument {
     }[];
 }
 
-function createDocument() {
-    const [doc, setDocument] = React.useState();
+export const getServerSideProps: GetServerSideProps = async () => {
+    const customers = await prisma.customer.findMany();
+    const products = await prisma.products.findMany();
+    const drivers = await prisma.driver.findMany();
+    const transports = await prisma.transport.findMany();
+    const orders = await prisma.order.findMany();
+    return { props: { customers, products, drivers, transports, orders } };
+};
 
-    function signDocument() {
-        console.log("Sign document");
+function createDocument({ customers, products, drivers, transports, orders }: { customers: Customer[]; products: Products[]; drivers: Driver[]; transports: Transport[], orders: any }) {
+    const [displayModal, setDisplayModal] = useState(false);
+
+    function toggleItemForm() {
+        setDisplayModal(!displayModal);
     }
 
-    function createPdf() {}
+    const router = useRouter();
+    function refreshPage() {
+        router.replace(router.asPath);
+    }
+
+    async function saveOrder(order: IOrder) {
+        const response = await fetch("/api/order", {
+            method: "POST",
+            body: JSON.stringify(order)
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
+    async function deleteOrder(id: number) {
+        const response = await fetch("/api/order", {
+            method: "DELETE",
+            body: JSON.stringify(id)
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
 
     return (
         <>
-            {doc ? (
-                <iframe src={doc} width="600px" height="1200px" />
-            ) : (
-                <>
-                    <div id="testInvoice">
-                        <h1>Test invoice</h1>
-                    </div>
-                    <button onClick={createPdf}>CreatePDF</button>
-                </>
-            )}
+            <span className="p-buttonset">
+                <Button label="Jauns rēķins" icon="pi pi-file" />
+                <Button label="Jauna pavadzīme" icon="pi pi-file" />
+                <Button disabled={orders.length === 0} label="Parakstīt" icon="pi pi-print" />
+            </span>
+
+            <Dialog visible={displayModal} onHide={toggleItemForm}>
+                {/* Komponente InvoiceEdit */}
+                {/* Komponente BillEdit */}
+            </Dialog>
         </>
     );
 }

@@ -62,6 +62,7 @@ model Order {
   transport      Transport      @relation(fields: [transportId], references: [id])
   transportId    Int
   discount       Float
+  documentType   String
 }
 
 model OrderProduct {
