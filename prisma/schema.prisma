@@ -12,15 +12,16 @@ generator client {
 
 // Rename to LegalEntity
 model Customer {
-  id             Int     @id @default(autoincrement())
-  email          String  @unique
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
   clientName     String
   legalAdress    String
   deliveryAdress String
   pvnCode        String
   account        String
   bankName       String
-  orders         Order[]
+  invoice        Invoice[]
+  bill           Bill[]
 }
 
 model Products {
@@ -37,42 +38,64 @@ model User {
 }
 
 model Driver {
-  id     Int     @id @default(autoincrement())
-  name   String
-  orders Order[]
+  id      Int       @id @default(autoincrement())
+  name    String
+  invoice Invoice[]
 }
 
 model Transport {
-  id     Int     @id @default(autoincrement())
-  name   String
-  number String
-  orders Order[]
+  id      Int       @id @default(autoincrement())
+  name    String
+  number  String
+  invoice Invoice[]
 }
 
-model Order {
-  id             Int            @id @default(autoincrement())
+model Invoice {
+  id              Int              @id @default(autoincrement())
+  dateCreated     String
+  dateDelivered   String
+  datePaymentDue  String
+  invoiceProducts InvoiceProduct[]
+  customer        Customer         @relation(fields: [customerId], references: [id])
+  customerId      Int
+  driver          Driver           @relation(fields: [driverId], references: [id])
+  driverId        Int
+  transport       Transport        @relation(fields: [transportId], references: [id])
+  transportId     Int
+  discount        Float
+  status          String
+}
+
+model Bill {
+  id             Int           @id @default(autoincrement())
   dateCreated    String
   dateDelivered  String
   datePaymentDue String
-  orderProducts  OrderProduct[]
-  customer       Customer       @relation(fields: [customerId], references: [id])
+  billProducts   BillProduct[]
+  customer       Customer      @relation(fields: [customerId], references: [id])
   customerId     Int
-  driver         Driver         @relation(fields: [driverId], references: [id])
-  driverId       Int
-  transport      Transport      @relation(fields: [transportId], references: [id])
-  transportId    Int
   discount       Float
-  documentType   String
+  status         String
 }
 
-model OrderProduct {
+model InvoiceProduct {
+  id          Int     @id @default(autoincrement())
+  quantity    Int
+  productName String
+  price       Float
+  unit        String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId   Int
+}
+
+model BillProduct {
   id          Int    @id @default(autoincrement())
   quantity    Int
   productName String
   price       Float
   unit        String
-  order       Order  @relation(fields: [orderId], references: [id])
-  orderId     Int
+  bill        Bill   @relation(fields: [billId], references: [id])
+  billId      Int
 }
 
 // Add measurement units

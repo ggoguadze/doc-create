@@ -1,16 +1,16 @@
 import { GetServerSideProps } from "next";
 import React, { useState } from "react";
 import { prisma } from "../prisma";
-import { Driver, Transport, Customer, Products, Order } from "@prisma/client";
+import { Driver, Transport, Customer, Products, Invoice } from "@prisma/client";
 import { useRouter } from "next/router";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CreateInvoice from "../components/CreateInvoice";
-import CreateBill from "../components/CreateBill";
 
-export interface IOrder {
+
+export interface IInvoice {
     invoiceNumber: string;
     date: string;
     driver: string;
@@ -29,49 +29,47 @@ export const getServerSideProps: GetServerSideProps = async () => {
     const products = await prisma.products.findMany();
     const drivers = await prisma.driver.findMany();
     const transports = await prisma.transport.findMany();
-    const orders = await prisma.order.findMany({
+    const invoice = await prisma.invoice.findMany({
         include: {
             customer: true
         }
     });
-    return { props: { customers, products, drivers, transports, orders } };
+    return { props: { customers, products, drivers, transports, invoice } };
 };
 
-type OrderWithCustomer = Order & { customer: Customer };
+type InvoiceWithCustomer = Invoice & { customer: Customer };
 
-function createDocument({
+function createInvoice({
     customers,
     products,
     drivers,
     transports,
-    orders
+    invoice
 }: {
     customers: Customer[];
     products: Products[];
     drivers: Driver[];
     transports: Transport[];
-    orders: OrderWithCustomer[];
+    invoice: InvoiceWithCustomer[];
 }) {
     const [displayInvoiceModal, setDisplayInvoiceModal] = useState(false);
-    const [displayBillModal, setDisplayBillModal] = useState(false);
+
 
     function toggleInvoiceItemForm() {
         setDisplayInvoiceModal(!displayInvoiceModal);
     }
 
-    function toggleBillItemForm() {
-        setDisplayBillModal(!displayBillModal);
-    }
+
 
     const router = useRouter();
     function refreshPage() {
         router.replace(router.asPath);
     }
 
-    async function saveOrder(order: IOrder) {
-        const response = await fetch("/api/order", {
+    async function saveInvoice(invoice: IInvoice) {
+        const response = await fetch("/api/invoice", {
             method: "POST",
-            body: JSON.stringify(order)
+            body: JSON.stringify(invoice)
         });
 
         if (!response.ok) {
@@ -81,8 +79,8 @@ function createDocument({
         return await response.json().then(() => refreshPage());
     }
 
-    async function deleteOrder(id: number) {
-        const response = await fetch("/api/order", {
+    async function deleteInvoice(id: number) {
+        const response = await fetch("/api/invoice", {
             method: "DELETE",
             body: JSON.stringify(id)
         });
@@ -101,60 +99,57 @@ function createDocument({
     return (
         <>
             <span className="p-buttonset">
-                <Button onClick={toggleBillItemForm} label="Jauns rēķins" icon="pi pi-file" />
                 <Button onClick={toggleInvoiceItemForm} label="Jauna pavadzīme" icon="pi pi-file" />
-                <Button disabled={orders.length === 0} label="Parakstīt" icon="pi pi-print" />
+                <Button disabled={invoice.length === 0} label="Parakstīt" icon="pi pi-print" />
             </span>
 
-            <DataTable dataKey="id" selectionMode="single" value={orders}>
+            <DataTable dataKey="id" selectionMode="single" value={invoice}>
                 <Column
                     field="id"
-                    header="Dokumenta numurs"
-                    body={(order: OrderWithCustomer) => {
-                        return order.id.toString().padStart(4, "0");
+                    header="Pavadzīmes numurs"
+                    body={(invoice: InvoiceWithCustomer) => {
+                        return invoice.id.toString().padStart(4, "0");
                     }}
                 ></Column>
                 <Column
                     field="dateCreated"
                     header="Izveides datums"
-                    body={(order: OrderWithCustomer) => {
-                        return new Date(order.dateCreated).toLocaleString();
+                    body={(invoice: InvoiceWithCustomer) => {
+                        return new Date(invoice.dateCreated).toLocaleString();
                     }}
                 ></Column>
                 <Column
                     field="customer"
                     header="Klients"
-                    body={(order: OrderWithCustomer) => {
-                        return order.customer.clientName;
+                    body={(invoice: InvoiceWithCustomer) => {
+                        return invoice.customer.clientName;
                     }}
                 ></Column>
                 <Column
                     field="customer"
                     header="Adrese"
-                    body={(order: OrderWithCustomer) => {
-                        return order.customer.legalAdress;
+                    body={(invoice: InvoiceWithCustomer) => {
+                        return invoice.customer.legalAdress;
                     }}
                 ></Column>
                 <Column
-                    body={(order: OrderWithCustomer) => {
+                    body={(invoice: InvoiceWithCustomer) => {
                         return (
                             <>
-                                <Button onClick={() => previewDocument(order.id)} label="Apskatīt" icon="pi pi-file" />
-                                <Button onClick={() => deleteOrder(order.id)} label="Dzēst" icon="pi pi-file" />
+                                <Button onClick={() => previewDocument(invoice.id)} label="Apskatīt" icon="pi pi-file" />
+                                <Button onClick={() => deleteInvoice(invoice.id)} label="Dzēst" icon="pi pi-file" />
                             </>
                         );
                     }}
                 ></Column>
             </DataTable>
-
-            <Dialog visible={displayInvoiceModal} onHide={toggleInvoiceItemForm}>
-                <CreateInvoice toggleItemForm={toggleInvoiceItemForm} saveInvoice={saveOrder} />
-            </Dialog>
-            <Dialog visible={displayBillModal} onHide={toggleBillItemForm}>
-                <CreateBill toggleItemForm={toggleBillItemForm} saveBill={saveOrder} />
-            </Dialog>
+            <div className="create-invoice">
+                <Dialog style={{ width: '50vw', height: '50vw' }} visible={displayInvoiceModal} onHide={toggleInvoiceItemForm}>
+                    <CreateInvoice customers={customers} transports={transports} drivers={drivers} products={products} toggleItemForm={toggleInvoiceItemForm} saveInvoice={saveInvoice} />
+                </Dialog>
+            </div>
         </>
     );
 }
 
-export default createDocument;
+export default createInvoice;

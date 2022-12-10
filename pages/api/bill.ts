@@ -3,13 +3,13 @@ import { prisma } from "../../prisma"
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const order = JSON.parse(req.body)
-        const savedOrder = await prisma.order.create({ data: order })
-        res.json(savedOrder)
+        const bill = JSON.parse(req.body)
+        const savedBill = await prisma.bill.create({ data: bill })
+        res.json(savedBill)
     } else if (req.method === "DELETE") {
         const id = JSON.parse(req.body)
-        const deletedOrder = await prisma.order.delete({ where: { id: id } })
-        res.json(deletedOrder)
+        const deletedBill = await prisma.bill.delete({ where: { id: id } })
+        res.json(deletedBill)
     }
 
 }

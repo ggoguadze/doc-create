@@ -1,21 +1,15 @@
-import { NextApiHandler } from 'next'
-const { chromium } = require('playwright')
+import { NextApiRequest, NextApiResponse } from "next"
+import { prisma } from "../../prisma"
 
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method === 'POST') {
+        const invoice = JSON.parse(req.body)
+        const savedInvoice = await prisma.invoice.create({ data: invoice })
+        res.json(savedInvoice)
+    } else if (req.method === "DELETE") {
+        const id = JSON.parse(req.body)
+        const deletedInvoice = await prisma.invoice.delete({ where: { id: id } })
+        res.json(deletedInvoice)
+    }
 
-
-
-const Handler: NextApiHandler = async (req, res) => {
-  const browser = await chromium.launch()
-  const page = await browser.newPage()
-
-  await page.goto('http://localhost:3000/invoice')
-  await page.emulateMediaType('screen')
-
-  const pdfBuffer = await page.pdf({ format: 'A4' })
-
-  res.send(pdfBuffer)
-
-  await browser.close()
 }
-
-export default Handler

@@ -15,10 +15,16 @@ const Nav = () => {
                     <Link href='/customer'>Klienti</Link>
                 </li>
                 <li>
-                    <Link href='/otherData'>Citi dati</Link>
+                    <Link href='/transport'>Transports</Link>
                 </li>
                 <li>
-                    <Link href='/createDocument'>Veidot dokumentu</Link>
+                    <Link href='/driver'>Vadītāji</Link>
+                </li>
+                <li>
+                    <Link href='/createInvoice'>Veidot pavadzīmi</Link>
+                </li>
+                <li>
+                    <Link href='/createBill'>Veidot rēķinu</Link>
                 </li>
                 <li>
                     <a className='logoutButton' href="/api/auth/logout">Izlogoties</a>

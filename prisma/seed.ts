@@ -3,7 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient();
 
-const customersData:Prisma.CustomerCreateInput[] = [
+const customersData: Prisma.CustomerCreateInput[] = [
     {
         email: 'berzs@gmail.com',
         clientName: 'SIA Berzs',
@@ -51,11 +51,11 @@ const customersData:Prisma.CustomerCreateInput[] = [
     }
 ]
 
-const productsData:Prisma.ProductsCreateInput[] = [
+const productsData: Prisma.ProductsCreateInput[] = [
     {
         name: 'Kartupeļu krējums',
         unit: 'kg',
-        price: 1.5 
+        price: 1.5
     },
     {
         name: 'Pīrāgi',
@@ -79,7 +79,7 @@ const productsData:Prisma.ProductsCreateInput[] = [
     }
 ]
 
-const driversData:Prisma.DriverCreateInput[] = [
+const driversData: Prisma.DriverCreateInput[] = [
     {
         name: 'Janis Bērzs'
     },
@@ -97,7 +97,7 @@ const driversData:Prisma.DriverCreateInput[] = [
     }
 ]
 
-const transportsData:Prisma.TransportCreateInput[] = [
+const transportsData: Prisma.TransportCreateInput[] = [
     {
         name: 'Volvo FH 16',
         number: 'LV1234'
@@ -120,29 +120,29 @@ const transportsData:Prisma.TransportCreateInput[] = [
     }
 ]
 
-const ordersData:Prisma.OrderCreateInput[] = [
+const invoicesData: Prisma.InvoiceCreateInput[] = [
     {
         dateCreated: new Date().toISOString(),
         dateDelivered: new Date().toISOString(),
         datePaymentDue: new Date().toISOString(),
-        customer:{
-            connect:{
+        customer: {
+            connect: {
                 id: 1
             }
         },
         driver: {
-            connect:{
+            connect: {
                 id: 1
             }
         },
         transport: {
-            connect:{
+            connect: {
                 id: 1
             }
         },
         discount: 0,
-        documentType: 'INVOICE',
-        orderProducts: {
+        status: 'UNSIGNED',
+        invoiceProducts: {
             create: [
                 {
                     quantity: 1,
@@ -157,27 +157,73 @@ const ordersData:Prisma.OrderCreateInput[] = [
         dateCreated: new Date().toISOString(),
         dateDelivered: new Date().toISOString(),
         datePaymentDue: new Date().toISOString(),
-        customer:{
-            connect:{
+        customer: {
+            connect: {
                 id: 2
             }
         },
         driver: {
-            connect:{
+            connect: {
                 id: 2
             }
         },
         transport: {
-            connect:{
+            connect: {
                 id: 2
             }
         },
         discount: 0,
-        documentType: 'INVOICE',
-        orderProducts: {
+        status: 'UNSIGNED',
+        invoiceProducts: {
             create: [
                 {
-                    
+                    quantity: 1,
+                    price: 2.5,
+                    productName: 'Pīrāgi',
+                    unit: 'kg'
+                }
+            ],
+        },
+    }
+]
+
+const billsData: Prisma.BillCreateInput[] = [
+    {
+        dateCreated: new Date().toISOString(),
+        dateDelivered: new Date().toISOString(),
+        datePaymentDue: new Date().toISOString(),
+        customer: {
+            connect: {
+                id: 1
+            }
+        },
+        discount: 0,
+        status: 'UNSIGNED',
+        billProducts: {
+            create: [
+                {
+                    quantity: 1,
+                    price: 1.5,
+                    productName: 'Kartupeļu krējums',
+                    unit: 'kg'
+                }
+            ],
+        },
+    },
+    {
+        dateCreated: new Date().toISOString(),
+        dateDelivered: new Date().toISOString(),
+        datePaymentDue: new Date().toISOString(),
+        customer: {
+            connect: {
+                id: 2
+            }
+        },
+        discount: 0,
+        status: 'UNSIGNED',
+        billProducts: {
+            create: [
+                {
                     quantity: 1,
                     price: 2.5,
                     productName: 'Pīrāgi',
@@ -191,44 +237,50 @@ const ordersData:Prisma.OrderCreateInput[] = [
 async function main() {
     console.log(`Start seeding ...`)
     for (const u of customersData) {
-      const user = await prisma.customer.create({
-        data: u,
-      })
-      console.log(`Created customer with id: ${user.id}`)
+        const user = await prisma.customer.create({
+            data: u,
+        })
+        console.log(`Created customer with id: ${user.id}`)
     }
     for (const u of productsData) {
         const product = await prisma.products.create({
-          data: u,
+            data: u,
         })
         console.log(`Created product with id: ${product.id}`)
-      }
-      for (const u of driversData) {
+    }
+    for (const u of driversData) {
         const driver = await prisma.driver.create({
-          data: u,
+            data: u,
         })
         console.log(`Created driver with id: ${driver.id}`)
-      }
-      for (const u of transportsData) {
+    }
+    for (const u of transportsData) {
         const transport = await prisma.transport.create({
-          data: u,
+            data: u,
         })
         console.log(`Created transport with id: ${transport.id}`)
-      }
-      for (const u of ordersData) {
-        const transport = await prisma.order.create({
-          data: u,
+    }
+    for (const u of invoicesData) {
+        const invoice = await prisma.invoice.create({
+            data: u,
         })
-        console.log(`Created transport with id: ${transport.id}`)
-      }
+        console.log(`Created invoice with id: ${invoice.id}`)
+    }
+    for (const u of billsData) {
+        const invoice = await prisma.bill.create({
+            data: u,
+        })
+        console.log(`Created bill with id: ${invoice.id}`)
+    }
     console.log(`Seeding finished.`)
-  }
-  
-  main()
+}
+
+main()
     .then(async () => {
-      await prisma.$disconnect()
+        await prisma.$disconnect()
     })
     .catch(async (e) => {
-      console.error(e)
-      await prisma.$disconnect()
-      process.exit(1)
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
     })
