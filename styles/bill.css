@@ -1,4 +1,4 @@
-.invoice-container {
+.bill-container {
     margin: 20px auto;
     padding: 30px;
     max-width: 600px;
@@ -7,13 +7,13 @@
 
 }
 
-.invoice-container .header {
+.bill-container .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.invoice-container .header .logo {
+.bill-container .header .logo {
     width: 100px;
     height: 100px;
     background-color: #fafafa;
@@ -26,34 +26,34 @@
     color: #000;
 }
 
-.invoice-container .content .own-firm-data {
+.bill-container .content .own-firm-data {
     display: flex;
     flex-direction: column;
     margin-top: 20px;
 }
 
-.invoice-container .footer {
+.bill-container .footer {
     display: flex;
 
 }
 
-.invoice-container .invoice-items {
+.bill-container .bill-items {
     padding: 10px 0
 }
 
-.invoice-container .footer .issued-to {
+.bill-container .footer .issued-to {
     width: 300px;
 }
 
-.invoice-container .footer .issued-by {
+.bill-container .footer .issued-by {
     width: 300px;
 }
 
-.invoice-container h6 {
+.bill-container h6 {
     margin: 0;
 }
 
-.invoice-container .invoice-items .p-column-title {
+.bill-container .bill-items .p-column-title {
     font-weight: 500;
     font-size: 12px;
     padding: 0;
@@ -61,8 +61,8 @@
     line-height: 1;
 }
 
-.invoice-container .p-datatable .p-datatable-tbody>tr>td,
-.invoice-container .p-datatable .p-datatable-thead>tr>th {
+.bill-container .p-datatable .p-datatable-tbody>tr>td,
+.bill-container .p-datatable .p-datatable-thead>tr>th {
     padding: 5px;
     margin: 0;
     font-weight: 500;

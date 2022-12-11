@@ -1,110 +1,70 @@
-
-.invoice-wrapper{
+.invoice-container {
 	margin: 20px auto;
-	max-width: 700px;
-	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	padding: 30px;
+	max-width: 600px;
+	min-height: 850px;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+
 }
-.invoice-top{
+
+.invoice-container .header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.invoice-container .header .logo {
+	width: 100px;
+	height: 100px;
 	background-color: #fafafa;
-	padding: 40px 60px;
-}
-/*
-Invoice-top-left refers to the client name & address, service provided
-*/
-.invoice-top-left{
-	margin-top: 60px;
-}
-.invoice-top-left h2 , .invoice-top-left h6{
-	line-height: 1.5;
-	font-family: 'Montserrat', sans-serif;
-}
-.invoice-top-left h4{
-	margin-top: 30px;
-	font-family: 'Montserrat', sans-serif;
-}
-.invoice-top-left h5{
-	line-height: 1.4;
-	font-family: 'Montserrat', sans-serif;
-	font-weight: 400;
-}
-.client-company-name{
-	font-size: 20px;
-	font-weight: 600;
-	margin-bottom: 0;
-}
-.client-address{
-	font-size: 14px;
-	margin-top: 5px;
-	color: rgba(0,0,0,0.75);
-}
-
-/*
-Invoice-top-right refers to the our name & address, logo and date
-*/
-.invoice-top-right h2 , .invoice-top-right h6{
-	text-align: right;
-	line-height: 1.5;
-	font-family: 'Montserrat', sans-serif;
-}
-.invoice-top-right h5{
-	line-height: 1.4;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400;
-    text-align: right;
-    margin-top: 0;
-}
-.our-company-name{
-	font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 0;
-}
-.our-address{
-	font-size: 13px;
-	margin-top: 0;
-	color: rgba(0,0,0,0.75);
-}
-.logo-wrapper{ overflow: auto; }
-
-/*
-Invoice-bottom refers to the bottom part of invoice template
-*/
-.invoice-bottom{
-	background-color: #ffffff;
-	padding: 40px 60px;
-	position: relative;
-}
-.title{
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	font-size: 30px;
-	font-family: 'Montserrat', sans-serif;
 	font-weight: 600;
-	margin-bottom: 30px;
+	color: #000;
 }
-/*
-Invoice-bottom-left
-*/
-.invoice-bottom-left h5, .invoice-bottom-left h4{
-	font-family: 'Montserrat', sans-serif;
+
+.invoice-container .content .own-firm-data {
+	display: flex;
+	flex-direction: column;
+	margin-top: 20px;
 }
-.invoice-bottom-left h4{
-	font-weight: 400;
+
+.invoice-container .footer {
+	display: flex;
+
 }
-.terms{
-	font-family: 'Montserrat', sans-serif;
-	font-size: 14px;
-	margin-top: 40px;
+
+.invoice-container .invoice-items {
+	padding: 10px 0
 }
-.divider{
-	margin-top: 50px;
-    margin-bottom: 5px;
+
+.invoice-container .footer .issued-to {
+	width: 300px;
 }
-/*
-bottom-bar is colored bar located at bottom of invoice-card
-*/
-.bottom-bar{
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 26px;
-	background-color: #323149;
+
+.invoice-container .footer .issued-by {
+	width: 300px;
+}
+
+.invoice-container h6 {
+	margin: 0;
+}
+
+.invoice-container .invoice-items .p-column-title {
+	font-weight: 500;
+	font-size: 12px;
+	padding: 0;
+	margin: 0;
+	line-height: 1;
+}
+
+.invoice-container .p-datatable .p-datatable-tbody>tr>td,
+.invoice-container .p-datatable .p-datatable-thead>tr>th {
+	padding: 5px;
+	margin: 0;
+	font-weight: 500;
+	font-size: 12px;
 }

@@ -1,111 +1,97 @@
-function billDetail() {
+import { Divider } from 'primereact/divider';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { GetServerSidePropsContext } from "next";
+import { prisma } from "../../prisma";
+import { Driver, Transport, Customer, BillProduct, Bill } from "@prisma/client";
+import { ParsedUrlQuery } from 'querystring';
+
+
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const { billId } = context.params as ParsedUrlQuery;
+    const bill = await prisma.bill.findUnique({
+        where: {
+            id: Number(billId)
+        },
+        include: {
+            customer: true,
+            billProducts: true
+        }
+    });
+    return { props: bill }
+
+}
+
+
+type BillWithData = Bill & { customer: Customer, billProducts: BillProduct[] };
+
+
+
+function billDetail(bill: BillWithData) {
+    console.log(JSON.stringify(bill.billProducts, null, 2))
     return (
-        <div className="container">
-            <div className="row">
-                <div className="col-xs-12">
-                    <div className="invoice-wrapper">
-                        <div className="invoice-top">
-                            <div className="row">
-                                <div className="col-sm-6">
-                                    <div className="invoice-top-left">
-                                        <h2 className="client-company-name">Google Inc.</h2>
-                                        <h6 className="client-address">
-                                            31 Lake Floyd Circle, <br />
-                                            Delaware, AC 987869 <br />
-                                            India
-                                        </h6>
-                                        <h4>Reference</h4>
-                                        <h5>
-                                            UX Design &amp; Development for <br /> Android App.
-                                        </h5>
-                                    </div>
-                                </div>
-                                <div className="col-sm-6">
-                                    <div className="invoice-top-right">
-                                        <h2 className="our-company-name">Acme LLP</h2>
-                                        <h6 className="our-address">
-                                            477 Blackwell Street, <br />
-                                            Dry Creek, Alaska <br />
-                                            India
-                                        </h6>
+        <div className='bill-container'>
+            <div className='header'>
+                <div className='logo'>
+                    <img src='/logo.png' alt='logo' />
+                </div>
+                <div className='date-created'>
+                    {new Date(bill.dateCreated).toLocaleString()}
+                </div>
+                <div className='bill-number'>
+                    <h3>Rēķins</h3> Nr. {bill.id.toString().padStart(4, "0")}
+                </div>
+            </div>
+            <Divider />
+            <div className='content'>
+                <div className='own-firm-data'>
+                    <h6>Nosūtītājs:</h6>
+                    <h6>Juridiskā adrese:</h6>
+                    <h6>Norēķinu rekvizīti:</h6>
+                </div>
+                <Divider />
 
-                                        <h5>06 September 2017</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="invoice-bottom">
-                            <div className="row">
-                                <div className="col-xs-12">
-                                    <h2 className="title">Invoice</h2>
-                                </div>
-                                <div className="clearfix"></div>
+                <div className='bill-items'>
+                    <DataTable value={bill.billProducts} responsiveLayout="scroll">
+                        <Column field="productName" header="Preču nosaukums"></Column>
+                        <Column body={(product: BillProduct) => {
+                            return product.quantity + ' ' + product.unit
+                        }} field="quantity" header="Daudzums"></Column>
+                        <Column field="price" header="Cena"></Column>
+                        <Column body={(product: BillProduct) => {
+                            return product.quantity * product.price
+                        }} header="Summa"></Column>
+                    </DataTable>
+                </div>
 
-                                <div className="col-sm-3 col-md-3">
-                                    <div className="invoice-bottom-left">
-                                        <h5>Invoice No.</h5>
-                                        <h4>BJI 009872</h4>
-                                    </div>
-                                </div>
-                                <div className="col-md-offset-1 col-md-8 col-sm-9">
-                                    <div className="invoice-bottom-right">
-                                        <table className="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Qty</th>
-                                                    <th>Description</th>
-                                                    <th>Price</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Initial research</td>
-                                                    <td>₹10,000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>UX design</td>
-                                                    <td>₹35,000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Web app development</td>
-                                                    <td>₹50,000</td>
-                                                </tr>
-                                                <tr style={{ height: "40px" }}></tr>
-                                            </tbody>
-                                            <thead>
-                                                <tr>
-                                                    <th>Total</th>
-                                                    <th></th>
-                                                    <th>₹95,000</th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                        <h4 className="terms">Terms</h4>
-                                        <ul>
-                                            <li>Invoice to be paid in advance.</li>
-                                            <li>Make payment in 2,3 business days.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="clearfix"></div>
-                                <div className="col-xs-12">
-                                    <hr className="divider" />
-                                </div>
-                                <div className="col-sm-4">
-                                    <h6 className="text-left">acme.com</h6>
-                                </div>
-                                <div className="col-sm-4">
-                                    <h6 className="text-center">contact@acme.com</h6>
-                                </div>
-                                <div className="col-sm-4">
-                                    <h6 className="text-right">+91 8097678988</h6>
-                                </div>
-                            </div>
-                            <div className="bottom-bar"></div>
-                        </div>
+                <div className='bill-total'>
+                    <h6>Kopā: {
+                        bill.billProducts.reduce((total, product) => total + product.quantity * product.price, 0).toFixed(2)
+                    } Eur</h6>
+                    <h6>PVN 21%: {
+                        (bill.billProducts.reduce((total, product) => total + product.quantity * product.price, 0) * 0.21).toFixed(2)
+                    } Eur</h6>
+                    <h6>Summa apmaksai: {
+                        (bill.billProducts.reduce((total, product) => total + product.quantity * product.price, 0) * 1.21).toFixed(2)
+                    } Eur</h6>
+                </div>
+            </div>
+            <Divider />
+            <div className='footer'>
+                <div className='issued-by'>
+                    <h6>Izsniedza</h6>
+                    <h6>Vārds, uzvārds: {bill.createdBy}</h6>
+                    <h6>Paraksts:</h6>
+                    <h6>Datums: </h6>
+                </div>
+                <Divider layout="vertical" />
+                <div className='issued-to'>
+                    <div className='issued-by'>
+                        <h6>Saņēma</h6>
+                        <h6>Vārds, uzvārds:</h6>
+                        <h6>Paraksts:</h6>
+                        <h6>Datums</h6>
                     </div>
                 </div>
             </div>

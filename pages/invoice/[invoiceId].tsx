@@ -7,15 +7,6 @@ import { Driver, Transport, Customer, InvoiceProduct, Invoice } from "@prisma/cl
 import { ParsedUrlQuery } from 'querystring';
 
 
-const products = [
-    { "id": "1000", "name": "Saldais krējums", "price": 1.5, "unit": "kg", "quantity": 1 },
-    { "id": "1001", "name": "Skābais krējums", "price": 1.5, "unit": "gab", "quantity": 12 },
-    { "id": "1002", "name": "Kartupeļi", "price": 2.5, "unit": "kg", "quantity": 3 },
-]
-
-
-
-
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const { invoiceId } = context.params as ParsedUrlQuery;
