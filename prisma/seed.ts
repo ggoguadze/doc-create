@@ -142,6 +142,7 @@ const invoicesData: Prisma.InvoiceCreateInput[] = [
         },
         discount: 0,
         status: 'UNSIGNED',
+        createdBy: 'Jānis Bērzs',
         invoiceProducts: {
             create: [
                 {
@@ -174,6 +175,7 @@ const invoicesData: Prisma.InvoiceCreateInput[] = [
         },
         discount: 0,
         status: 'UNSIGNED',
+        createdBy: 'Jānis Bērzs',
         invoiceProducts: {
             create: [
                 {
@@ -199,6 +201,7 @@ const billsData: Prisma.BillCreateInput[] = [
         },
         discount: 0,
         status: 'UNSIGNED',
+        createdBy: 'Jānis Bērzs',
         billProducts: {
             create: [
                 {
@@ -221,6 +224,7 @@ const billsData: Prisma.BillCreateInput[] = [
         },
         discount: 0,
         status: 'UNSIGNED',
+        createdBy: 'Jānis Bērzs',
         billProducts: {
             create: [
                 {

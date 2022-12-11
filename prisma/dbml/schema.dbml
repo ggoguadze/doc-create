@@ -1,0 +1,98 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Customer {
+  id Int [pk, increment]
+  email String [unique, not null]
+  clientName String [not null]
+  legalAdress String [not null]
+  deliveryAdress String [not null]
+  pvnCode String [not null]
+  account String [not null]
+  bankName String [not null]
+  invoice Invoice [not null]
+  bill Bill [not null]
+}
+
+Table Products {
+  id Int [pk, increment]
+  name String [not null]
+  price Float [not null]
+  unit String [not null]
+}
+
+Table Driver {
+  id Int [pk, increment]
+  name String [not null]
+  invoice Invoice [not null]
+}
+
+Table Transport {
+  id Int [pk, increment]
+  name String [not null]
+  number String [not null]
+  invoice Invoice [not null]
+}
+
+Table Invoice {
+  id Int [pk, increment]
+  dateCreated String [not null]
+  dateDelivered String [not null]
+  datePaymentDue String [not null]
+  invoiceProducts InvoiceProduct [not null]
+  customer Customer [not null]
+  customerId Int [not null]
+  driver Driver [not null]
+  driverId Int [not null]
+  transport Transport [not null]
+  transportId Int [not null]
+  discount Float [not null]
+  status String [not null]
+  createdBy String [not null]
+}
+
+Table Bill {
+  id Int [pk, increment]
+  dateCreated String [not null]
+  dateDelivered String [not null]
+  datePaymentDue String [not null]
+  billProducts BillProduct [not null]
+  customer Customer [not null]
+  customerId Int [not null]
+  discount Float [not null]
+  status String [not null]
+  createdBy String [not null]
+}
+
+Table InvoiceProduct {
+  id Int [pk, increment]
+  quantity Int [not null]
+  productName String [not null]
+  price Float [not null]
+  unit String [not null]
+  invoice Invoice [not null]
+  invoiceId Int [not null]
+}
+
+Table BillProduct {
+  id Int [pk, increment]
+  quantity Int [not null]
+  productName String [not null]
+  price Float [not null]
+  unit String [not null]
+  bill Bill [not null]
+  billId Int [not null]
+}
+
+Ref: Invoice.customerId > Customer.id
+
+Ref: Invoice.driverId > Driver.id
+
+Ref: Invoice.transportId > Transport.id
+
+Ref: Bill.customerId > Customer.id
+
+Ref: InvoiceProduct.invoiceId > Invoice.id
+
+Ref: BillProduct.billId > Bill.id

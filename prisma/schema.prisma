@@ -10,6 +10,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 // Rename to LegalEntity
 model Customer {
   id             Int       @id @default(autoincrement())
@@ -29,12 +33,6 @@ model Products {
   name  String
   price Float
   unit  String
-}
-
-// TODO use person model instead of user and driver
-model User {
-  id   Int    @id @default(autoincrement())
-  name String
 }
 
 model Driver {
@@ -64,6 +62,7 @@ model Invoice {
   transportId     Int
   discount        Float
   status          String
+  createdBy       String
 }
 
 model Bill {
@@ -76,6 +75,7 @@ model Bill {
   customerId     Int
   discount       Float
   status         String
+  createdBy      String
 }
 
 model InvoiceProduct {
@@ -97,6 +97,3 @@ model BillProduct {
   bill        Bill   @relation(fields: [billId], references: [id])
   billId      Int
 }
-
-// Add measurement units
-// Add products + quantity + price? + discounts? to order

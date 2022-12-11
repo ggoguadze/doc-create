@@ -1,0 +1,62 @@
+.invoice-container {
+    margin: 20px auto;
+    padding: 30px;
+    max-width: 600px;
+    min-height: 850px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+
+}
+
+.invoice-container .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.invoice-container .header .logo {
+    width: 100px;
+    height: 100px;
+    background-color: #fafafa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-weight: 600;
+    color: #000;
+}
+
+.invoice-container .content .own-firm-data {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.invoice-container .footer {
+    display: flex;
+}
+
+.invoice-container .footer .issued-to {
+    width: 300px;
+}
+
+.invoice-container .footer .issued-by {
+    width: 300px;
+}
+
+.invoice-container h6 {
+    margin: 0;
+}
+
+.invoice-container .invoice-items .p-column-title {
+    font-weight: 500;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+}
+
+.invoice-container .p-datatable .p-datatable-tbody>tr>td {
+    padding: 5px;
+    margin: 0;
+}
