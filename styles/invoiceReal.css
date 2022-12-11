@@ -36,6 +36,10 @@
     display: flex;
 }
 
+.invoice-container .invoice-items {
+    padding: 10px 0
+}
+
 .invoice-container .footer .issued-to {
     width: 300px;
 }
@@ -56,7 +60,10 @@
     line-height: 1;
 }
 
-.invoice-container .p-datatable .p-datatable-tbody>tr>td {
+.invoice-container .p-datatable .p-datatable-tbody>tr>td,
+.invoice-container .p-datatable .p-datatable-thead>tr>th {
     padding: 5px;
     margin: 0;
+    font-weight: 500;
+    font-size: 12px;
 }
