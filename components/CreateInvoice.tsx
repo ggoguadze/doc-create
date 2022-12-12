@@ -24,8 +24,6 @@ function CreateInvoice(props: ICreateInvoiceProps) {
     const [selectedDriver, setSelectedDriver] = useState<any>(null);
     const [deliveryDate, setDeliveryDate] = useState<Date | Date[] | undefined | null | string>(undefined);
     const [paymentDueDate, setPaymentDueDate] = useState<Date | Date[] | undefined | null | string>(undefined);
-    console.log(deliveryDate)
-    console.log(paymentDueDate)
 
     const onCustomerChange = (e: { value: any }) => {
         setSelectedCustomer(e.value);

@@ -18,3 +18,17 @@ a {
 .form-item {
   padding-bottom: 20px;
 }
+
+.form-content {
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 10px !important;
+}
+
+.form-content>span {
+  margin-bottom: 40px;
+}

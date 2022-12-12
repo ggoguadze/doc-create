@@ -1,5 +1,4 @@
 import Nav from './Nav'
-import styles from '../styles/Layout.module.css'
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 const layout = ({ children }) => {

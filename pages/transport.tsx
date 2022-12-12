@@ -1,14 +1,14 @@
 import { prisma } from "../prisma";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import TransportEdit from "../components/TransportEdit";
-import DriverEdit from "../components/DriverEdit";
 import { Transport } from "@prisma/client";
 import { GetServerSideProps } from "next";
+
 
 export interface ITransport {
     name: string;
@@ -62,7 +62,6 @@ function otherData({ transports }: { transports: Transport[] }) {
     }
 
     async function deleteTransport(id: number) {
-        console.log(JSON.stringify(id));
         const response = await fetch("/api/transport", {
             method: "DELETE",
             body: JSON.stringify(id)
@@ -81,8 +80,8 @@ function otherData({ transports }: { transports: Transport[] }) {
             <div className="transport-edit-container">
                 <span className="p-buttonset">
                     <Button onClick={toggleTransportItemForm} label="Jauns" icon="pi pi-file" />
-                    <Button onClick={onEditTransport} label="Labot" icon="pi pi-pencil" />
-                    <Button onClick={() => deleteTransport(selectedTransport)} label="Dzēst" icon="pi pi-trash" />
+                    <Button disabled={selectedTransport === 0} onClick={onEditTransport} label="Labot" icon="pi pi-pencil" />
+                    <Button disabled={selectedTransport === 0} onClick={() => deleteTransport(selectedTransport)} label="Dzēst" icon="pi pi-trash" />
                 </span>
                 <DataTable
                     dataKey="id"
@@ -91,6 +90,7 @@ function otherData({ transports }: { transports: Transport[] }) {
                     onSelectionChange={(e) => setSelectedTransport(e.value.id)}
                     value={transports}
                 >
+                    <Column style={{ width: '20px' }} selectionMode="single"></Column>
                     <Column field="name" header="Nosaukums"></Column>
                     <Column field="number" header="Reģistrācijas nummurs"></Column>
                 </DataTable>

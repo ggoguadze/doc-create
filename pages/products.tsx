@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 export interface IProduct {
     name: string;
     price: number;
+    unit: string;
 }
 
 export const getServerSideProps = async () => {
@@ -38,6 +39,14 @@ function products({ products }: { products: Products[] }) {
     }
 
     async function saveProduct(product: IProduct) {
+        if (selectedProduct) {
+            updateProduct(selectedProduct, product);
+        } else {
+            createProduct(product);
+        }
+    }
+
+    async function createProduct(product: IProduct) {
         const response = await fetch("/api/products", {
             method: "POST",
             body: JSON.stringify(product)
@@ -50,8 +59,22 @@ function products({ products }: { products: Products[] }) {
         return await response.json().then(() => refreshPage());
     }
 
+    async function updateProduct(id: number, product: IProduct) {
+
+
+        const response = await fetch("/api/products", {
+            method: "PATCH",
+            body: JSON.stringify({ id, product })
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
     async function deleteProduct(id: number) {
-        console.log(JSON.stringify(id));
         const response = await fetch("/api/products", {
             method: "DELETE",
             body: JSON.stringify(id)
@@ -68,8 +91,8 @@ function products({ products }: { products: Products[] }) {
         <div>
             <span className="p-buttonset">
                 <Button onClick={toggleItemForm} label="Jauns" icon="pi pi-file" />
-                <Button onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
-                <Button onClick={() => deleteProduct(selectedProduct)} label="Dzēst" icon="pi pi-trash" />
+                <Button disabled={selectedProduct === 0} onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
+                <Button disabled={selectedProduct === 0} onClick={() => deleteProduct(selectedProduct)} label="Dzēst" icon="pi pi-trash" />
             </span>
             <DataTable
                 dataKey="id"
@@ -78,8 +101,10 @@ function products({ products }: { products: Products[] }) {
                 onSelectionChange={(e) => setSelectedProduct(e.value.id)}
                 value={products}
             >
+                <Column style={{ width: '20px' }} selectionMode="single"></Column>
                 <Column field="name" header="Nosaukums"></Column>
                 <Column field="price" header="Cena"></Column>
+                <Column field="unit" header="Mērvienība"></Column>
             </DataTable>
             <Dialog visible={displayModal} onHide={toggleItemForm}>
                 <ProductsEdit selectedData={productEdit} toggleItemForm={toggleItemForm} saveProduct={saveProduct} />

@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { GetServerSidePropsContext } from "next";
 import { prisma } from "../../prisma";
-import { Driver, Transport, Customer, BillProduct, Bill } from "@prisma/client";
+import { Customer, BillProduct, Bill } from "@prisma/client";
 import { ParsedUrlQuery } from 'querystring';
 
 
@@ -29,7 +29,6 @@ type BillWithData = Bill & { customer: Customer, billProducts: BillProduct[] };
 
 
 function billDetail(bill: BillWithData) {
-    console.log(JSON.stringify(bill.billProducts, null, 2))
     return (
         <div className='bill-container'>
             <div className='header'>

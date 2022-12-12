@@ -13,11 +13,13 @@ interface IProductsEditProps {
 function ProductsEdit(props: IProductsEditProps) {
     const [productName, setProductName] = React.useState(props.selectedData?.name ?? "");
     const [price, setPrice] = React.useState(props.selectedData?.price ?? 0);
+    const [unit, setUnit] = React.useState(props.selectedData?.unit ?? "");
 
     function onCustomerSave() {
         props.saveProduct({
             name: productName,
-            price
+            price,
+            unit
         });
         props.toggleItemForm();
     }
@@ -33,6 +35,11 @@ function ProductsEdit(props: IProductsEditProps) {
                 <span className="p-float-label">
                     <InputNumber id="price" value={price} onChange={(e) => setPrice(e.value ? e.value : 0)} />
                     <label htmlFor="price">Cena</label>
+                </span>
+
+                <span className="p-float-label">
+                    <InputText id="unit" value={unit} onChange={(e) => setUnit(e.target.value)} />
+                    <label htmlFor="unit">Mērvienība	</label>
                 </span>
             </div>
             <div className="form-footer">

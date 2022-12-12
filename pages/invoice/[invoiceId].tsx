@@ -31,7 +31,6 @@ type InvoiceWithCustomer = Invoice & { customer: Customer, driver: Driver, trans
 
 
 function invoiceDetail(invoice: InvoiceWithCustomer) {
-    console.log(JSON.stringify(invoice.invoiceProducts, null, 2))
     return (
         <div className='invoice-container'>
             <div className='header'>

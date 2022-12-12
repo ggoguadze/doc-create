@@ -60,7 +60,6 @@ function otherData({ drivers }: { drivers: Driver[] }) {
     }
 
     async function deleteDriver(id: number) {
-        console.log(JSON.stringify(id));
         const response = await fetch("/api/driver", {
             method: "DELETE",
             body: JSON.stringify(id)
@@ -78,8 +77,8 @@ function otherData({ drivers }: { drivers: Driver[] }) {
             <div className="driver-edit-container">
                 <span className="p-buttonset">
                     <Button onClick={toggleDriverItemForm} label="Jauns" icon="pi pi-file" />
-                    <Button onClick={onEditDriver} label="Labot" icon="pi pi-pencil" />
-                    <Button onClick={() => deleteDriver(selectedDriver)} label="Dzēst" icon="pi pi-trash" />
+                    <Button disabled={selectedDriver === 0} onClick={onEditDriver} label="Labot" icon="pi pi-pencil" />
+                    <Button disabled={selectedDriver === 0} onClick={() => deleteDriver(selectedDriver)} label="Dzēst" icon="pi pi-trash" />
                 </span>
                 <DataTable
                     dataKey="id"
@@ -88,6 +87,7 @@ function otherData({ drivers }: { drivers: Driver[] }) {
                     onSelectionChange={(e) => setSelectedDriver(e.value.id)}
                     value={drivers}
                 >
+                    <Column style={{ width: '20px' }} selectionMode="single"></Column>
                     <Column field="name" header="Vārds, Uzvārds"></Column>
                 </DataTable>
                 <Dialog visible={displayDriverModal} onHide={toggleDriverItemForm}>

@@ -2,7 +2,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { prisma } from "../prisma";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { useRouter } from "next/router";
 import CustomerEdit from "../components/CustomerEdit";
@@ -28,6 +28,13 @@ function clients({ customers }: { customers: Customer[] }) {
     const [displayModal, setDisplayModal] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(0);
     const [customerEdit, setCustomerEdit] = useState<ICustomer | undefined>(undefined);
+
+    useEffect(() => {
+        if (selectedCustomer === 0) {
+            setCustomerEdit(undefined);
+        }
+    }, [selectedCustomer]);
+
 
     function toggleItemForm() {
         setDisplayModal(!displayModal);
@@ -58,7 +65,6 @@ function clients({ customers }: { customers: Customer[] }) {
     }
 
     async function deleteCustomer(id: number) {
-        console.log(JSON.stringify(id));
         const response = await fetch("/api/customers", {
             method: "DELETE",
             body: JSON.stringify(id)
@@ -75,8 +81,8 @@ function clients({ customers }: { customers: Customer[] }) {
         <div>
             <span className="p-buttonset">
                 <Button onClick={toggleItemForm} label="Jauns" icon="pi pi-file" />
-                <Button onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
-                <Button onClick={() => deleteCustomer(selectedCustomer)} label="Dzēst" icon="pi pi-trash" />
+                <Button disabled={selectedCustomer === 0} onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
+                <Button disabled={selectedCustomer === 0} onClick={() => deleteCustomer(selectedCustomer)} label="Dzēst" icon="pi pi-trash" />
             </span>
 
             <DataTable
