@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { IInvoice } from "../pages/createInvoice";
 import { Dropdown } from "primereact/dropdown";
 import { Driver, Transport, Customer, Products, InvoiceProduct } from "@prisma/client";
@@ -27,6 +26,21 @@ function CreateInvoice(props: ICreateInvoiceProps) {
     const [selectedProducts, setSelectedProducts] = useState<InvoiceProduct[]>([
         { id: 1, productName: "Produkts 1", quantity: 1, price: 2, unit: "kg", invoiceId: 1 }
     ]);
+
+    function onInvoiceSave() {
+        props.saveInvoice({
+            dateCreated: new Date().toISOString(),
+            dateDelivered: deliveryDate as string,
+            datePaymentDue: paymentDueDate as string,
+            status: "UNSIGNED",
+            customerId: selectedCustomer.id,
+            driverId: selectedDriver.id,
+            transportId: selectedTransport.id,
+            createdBy: "admin",
+            products: selectedProducts
+        });
+        props.toggleItemForm();
+    }
 
     const onCustomerChange = (e: { value: any }) => {
         setSelectedCustomer(e.value);
@@ -209,7 +223,7 @@ function CreateInvoice(props: ICreateInvoiceProps) {
             </DataTable>
             <div className="form-footer">
                 <span className="p-buttonset">
-                    <Button onClick={props.toggleItemForm} label="Saglabāt" icon="pi pi-save" />
+                    <Button onClick={onInvoiceSave} label="Saglabāt" icon="pi pi-save" />
                     <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
                 </span>
             </div>

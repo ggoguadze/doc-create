@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import React, { useState } from "react";
 import { prisma } from "../prisma";
-import { Driver, Transport, Customer, Products, Invoice } from "@prisma/client";
+import { Driver, Transport, Customer, Products, Invoice, InvoiceProduct } from "@prisma/client";
 import { useRouter } from "next/router";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -10,17 +10,15 @@ import { Column } from "primereact/column";
 import CreateInvoice from "../components/CreateInvoice";
 
 export interface IInvoice {
-    invoiceNumber: string;
-    date: string;
-    driver: string;
-    transportName: string;
-    transportNumber: string;
-    items: {
-        name: string;
-        quantity: string;
-        price: string;
-        total: string;
-    }[];
+    dateCreated: string;
+    dateDelivered: string;
+    datePaymentDue: string;
+    status: string;
+    customerId: number;
+    driverId: number;
+    transportId: number;
+    createdBy: string;
+    products: InvoiceProduct[];
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {

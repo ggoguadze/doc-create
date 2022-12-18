@@ -15,7 +15,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       
       await browser.close()
   
- // }
   res.setHeader('Content-Type', 'application/pdf')
   res.setHeader('Content-Length', pdfBuffer.length)
   console.log(pdfBuffer)
