@@ -76,8 +76,10 @@ function CustomerEdit(props: ICustumerEditProps) {
             </div>
 
             <div className="form-footer">
-                <Button onClick={onCustomerSave} label="Saglabāt" icon="pi pi-save" />
-                <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                <span className="p-buttonset">
+                    <Button onClick={onCustomerSave} label="Saglabāt" icon="pi pi-save" />
+                    <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                </span>
             </div>
         </>
     );

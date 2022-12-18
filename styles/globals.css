@@ -32,3 +32,9 @@ a {
 .form-content>span {
   margin-bottom: 40px;
 }
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+}

@@ -5,7 +5,6 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import TransportEdit from "../components/TransportEdit";
 import DriverEdit from "../components/DriverEdit";
 import { Driver } from "@prisma/client";
 import { GetServerSideProps } from "next";
@@ -40,16 +39,42 @@ function otherData({ drivers }: { drivers: Driver[] }) {
         toggleDriverItemForm();
     }
 
+    function onCreateDriver() {
+        setDriverEdit(undefined);
+        toggleDriverItemForm();
+    }
+
     const router = useRouter();
     function refreshPage() {
         router.replace(router.asPath);
     }
 
-
     async function saveDriver(driver: IDriver) {
+        if (driverEdit) {
+            updateDriver(selectedDriver, driver);
+        } else {
+            createDriver(driver);
+        }
+    }
+
+
+    async function createDriver(driver: IDriver) {
         const response = await fetch("/api/driver", {
             method: "POST",
             body: JSON.stringify(driver)
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
+    async function updateDriver(id: number, driver: IDriver) {
+        const response = await fetch("/api/driver", {
+            method: "PATCH",
+            body: JSON.stringify({ id, driver })
         });
 
         if (!response.ok) {
@@ -76,16 +101,16 @@ function otherData({ drivers }: { drivers: Driver[] }) {
         <div className="other-data-container">
             <div className="driver-edit-container">
                 <span className="p-buttonset">
-                    <Button onClick={toggleDriverItemForm} label="Jauns" icon="pi pi-file" />
+                    <Button onClick={onCreateDriver} label="Jauns" icon="pi pi-file" />
                     <Button disabled={selectedDriver === 0} onClick={onEditDriver} label="Labot" icon="pi pi-pencil" />
                     <Button disabled={selectedDriver === 0} onClick={() => deleteDriver(selectedDriver)} label="Dzēst" icon="pi pi-trash" />
                 </span>
                 <DataTable
                     dataKey="id"
-                    selectionMode="single"
-                    selection={selectedDriver}
-                    onSelectionChange={(e) => setSelectedDriver(e.value.id)}
+                    selection={drivers.find((driver) => driver.id === selectedDriver)}
+                    onSelectionChange={(e) => { e.value ? setSelectedDriver(e.value.id) : setSelectedDriver(0) }}
                     value={drivers}
+                    emptyMessage="Nav datu"
                 >
                     <Column style={{ width: '20px' }} selectionMode="single"></Column>
                     <Column field="name" header="Vārds, Uzvārds"></Column>

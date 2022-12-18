@@ -10,6 +10,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const id = JSON.parse(req.body)
         const deletedTransport = await prisma.transport.delete({ where: { id: id } })
         res.json(deletedTransport)
+    } else if (req.method === 'PATCH') {
+        const body = JSON.parse(req.body)
+        const updatedTransport = await prisma.transport.update({ where: { id: body.id }, data: body.transport })
+        res.json(updatedTransport)
     }
 
 }

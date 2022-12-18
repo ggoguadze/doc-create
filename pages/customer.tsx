@@ -2,7 +2,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { prisma } from "../prisma";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { useRouter } from "next/router";
 import CustomerEdit from "../components/CustomerEdit";
@@ -29,12 +29,6 @@ function clients({ customers }: { customers: Customer[] }) {
     const [selectedCustomer, setSelectedCustomer] = useState(0);
     const [customerEdit, setCustomerEdit] = useState<ICustomer | undefined>(undefined);
 
-    useEffect(() => {
-        if (selectedCustomer === 0) {
-            setCustomerEdit(undefined);
-        }
-    }, [selectedCustomer]);
-
 
     function toggleItemForm() {
         setDisplayModal(!displayModal);
@@ -46,15 +40,41 @@ function clients({ customers }: { customers: Customer[] }) {
         toggleItemForm();
     }
 
+    function onCreateCustomer() {
+        setCustomerEdit(undefined);
+        toggleItemForm();
+    }
+
     const router = useRouter();
     function refreshPage() {
         router.replace(router.asPath);
     }
 
     async function saveCustomer(customer: ICustomer) {
+        if (customerEdit) {
+            updateCustomer(selectedCustomer, customer);
+        } else {
+            createCustomer(customer);
+        }
+    }
+
+    async function createCustomer(customer: ICustomer) {
         const response = await fetch("/api/customers", {
             method: "POST",
             body: JSON.stringify(customer)
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
+    async function updateCustomer(id: number, customer: ICustomer) {
+        const response = await fetch("/api/cutomers", {
+            method: "PATCH",
+            body: JSON.stringify({ id, customer })
         });
 
         if (!response.ok) {
@@ -80,7 +100,7 @@ function clients({ customers }: { customers: Customer[] }) {
     return (
         <div>
             <span className="p-buttonset">
-                <Button onClick={toggleItemForm} label="Jauns" icon="pi pi-file" />
+                <Button onClick={onCreateCustomer} label="Jauns" icon="pi pi-file" />
                 <Button disabled={selectedCustomer === 0} onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
                 <Button disabled={selectedCustomer === 0} onClick={() => deleteCustomer(selectedCustomer)} label="Dzēst" icon="pi pi-trash" />
             </span>
@@ -88,10 +108,12 @@ function clients({ customers }: { customers: Customer[] }) {
             <DataTable
                 dataKey="id"
                 selectionMode="single"
-                selection={selectedCustomer}
-                onSelectionChange={(e) => setSelectedCustomer(e.value.id)}
+                selection={customers.find((customer) => customer.id === selectedCustomer)}
+                onSelectionChange={(e) => { e.value ? setSelectedCustomer(e.value.id) : setSelectedCustomer(0) }}
                 value={customers}
+                emptyMessage="Nav datu"
             >
+                <Column style={{ width: '20px' }} selectionMode="single"></Column>
                 <Column field="clientName" header="Nosaukums"></Column>
                 <Column field="email" header="E-pasts"></Column>
                 <Column field="legalAdress" header="Adrese"></Column>

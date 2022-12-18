@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { GetServerSidePropsContext } from "next";
 import { prisma } from "../../prisma";
-import { Driver, Transport, Customer, InvoiceProduct, Invoice } from "@prisma/client";
+import { Driver, Transport, Customer, InvoiceProduct, Invoice, User } from "@prisma/client";
 import { ParsedUrlQuery } from 'querystring';
 
 
@@ -21,7 +21,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             invoiceProducts: true
         }
     });
-    return { props: invoice }
+    const user = await prisma.user.findMany();
+    return { props: { invoice, user } }
 
 }
 
@@ -30,7 +31,8 @@ type InvoiceWithCustomer = Invoice & { customer: Customer, driver: Driver, trans
 
 
 
-function invoiceDetail(invoice: InvoiceWithCustomer) {
+function invoiceDetail({ invoice, user }: { invoice: InvoiceWithCustomer, user: User[] }) {
+    const userInfo = user[0];
     return (
         <div className='invoice-container'>
             <div className='header'>
@@ -47,10 +49,10 @@ function invoiceDetail(invoice: InvoiceWithCustomer) {
             <Divider />
             <div className='content'>
                 <div className='own-firm-data'>
-                    <h6>Nosūtītājs:</h6>
-                    <h6>Juridiskā adrese:</h6>
-                    <h6>Iekraušanas adrese:</h6>
-                    <h6>Norēķinu rekvizīti:</h6>
+                    <h6>Nosūtītājs: {userInfo.name}</h6>
+                    <h6>Juridiskā adrese: {userInfo.legalAdress}</h6>
+                    <h6>Iekraušanas adrese: {userInfo.deliveryAdress}</h6>
+                    <h6>Norēķinu rekvizīti: {userInfo.bankName + " " + userInfo.account}</h6>
                 </div>
                 <Divider />
                 <div className='customer-data'>
@@ -61,8 +63,8 @@ function invoiceDetail(invoice: InvoiceWithCustomer) {
                 </div>
                 <Divider />
                 <div className='transport-driver-data'>
-                    <h6>Transporta līdzeklis:</h6>
-                    <h6>Vadītājs:</h6>
+                    <h6>Transporta līdzeklis: {invoice.transport.name + " Reģistrācijas numurs: " + invoice.transport.number}</h6>
+                    <h6>Vadītājs: {invoice.driver.name}</h6>
                 </div>
 
                 <div className='invoice-items'>

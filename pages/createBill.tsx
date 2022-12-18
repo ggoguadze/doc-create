@@ -134,10 +134,10 @@ function createBill({
                 <Column
                     body={(bill: BillWithCustomer) => {
                         return (
-                            <>
+                            <span className="p-buttonset">
                                 <Button onClick={() => previewDocument(bill.id)} label="Apskatīt" icon="pi pi-file" />
                                 <Button onClick={() => deleteBill(bill.id)} label="Dzēst" icon="pi pi-file" />
-                            </>
+                            </span>
                         );
                     }}
                 ></Column>

@@ -27,9 +27,14 @@ function products({ products }: { products: Products[] }) {
     function toggleItemForm() {
         setDisplayModal(!displayModal);
     }
-    function onEditCustomer() {
+    function onEditProduct() {
         const product = products.find((product) => product.id === selectedProduct) as IProduct;
         setProductEdit(product);
+        toggleItemForm();
+    }
+
+    function onCreateProduct() {
+        setProductEdit(undefined);
         toggleItemForm();
     }
 
@@ -39,7 +44,7 @@ function products({ products }: { products: Products[] }) {
     }
 
     async function saveProduct(product: IProduct) {
-        if (selectedProduct) {
+        if (productEdit) {
             updateProduct(selectedProduct, product);
         } else {
             createProduct(product);
@@ -60,8 +65,6 @@ function products({ products }: { products: Products[] }) {
     }
 
     async function updateProduct(id: number, product: IProduct) {
-
-
         const response = await fetch("/api/products", {
             method: "PATCH",
             body: JSON.stringify({ id, product })
@@ -90,16 +93,16 @@ function products({ products }: { products: Products[] }) {
     return (
         <div>
             <span className="p-buttonset">
-                <Button onClick={toggleItemForm} label="Jauns" icon="pi pi-file" />
-                <Button disabled={selectedProduct === 0} onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
+                <Button onClick={onCreateProduct} label="Jauns" icon="pi pi-file" />
+                <Button disabled={selectedProduct === 0} onClick={onEditProduct} label="Labot" icon="pi pi-pencil" />
                 <Button disabled={selectedProduct === 0} onClick={() => deleteProduct(selectedProduct)} label="Dzēst" icon="pi pi-trash" />
             </span>
             <DataTable
                 dataKey="id"
-                selectionMode="single"
-                selection={selectedProduct}
-                onSelectionChange={(e) => setSelectedProduct(e.value.id)}
+                selection={products.find((product) => product.id === selectedProduct)}
+                onSelectionChange={(e) => { e.value ? setSelectedProduct(e.value.id) : setSelectedProduct(0) }}
                 value={products}
+                emptyMessage="Nav datu"
             >
                 <Column style={{ width: '20px' }} selectionMode="single"></Column>
                 <Column field="name" header="Nosaukums"></Column>

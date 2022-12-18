@@ -1,7 +1,7 @@
 import { InputText } from "primereact/inputtext";
 import * as React from "react";
 import { Button } from "primereact/button";
-import { IDriver } from "../pages/otherData";
+import { IDriver } from "../pages/driver";
 
 interface IDriverEditProps {
     saveDriver: (driver: IDriver) => void;
@@ -28,8 +28,10 @@ function DriverEdit(props: IDriverEditProps) {
                 </span>
             </div>
             <div className="form-footer">
-                <Button onClick={onDriverSave} label="Saglabāt" icon="pi pi-save" />
-                <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                <span className="p-buttonset">
+                    <Button onClick={onDriverSave} label="Saglabāt" icon="pi pi-save" />
+                    <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                </span>
             </div>
         </>
     );

@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { GetServerSidePropsContext } from "next";
 import { prisma } from "../../prisma";
-import { Customer, BillProduct, Bill } from "@prisma/client";
+import { Customer, BillProduct, Bill, User } from "@prisma/client";
 import { ParsedUrlQuery } from 'querystring';
 
 
@@ -19,7 +19,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             billProducts: true
         }
     });
-    return { props: bill }
+    const user = await prisma.user.findMany();
+    return { props: { bill, user } }
 
 }
 
@@ -28,7 +29,8 @@ type BillWithData = Bill & { customer: Customer, billProducts: BillProduct[] };
 
 
 
-function billDetail(bill: BillWithData) {
+function billDetail({ bill, user }: { bill: BillWithData, user: User[] }) {
+    const userInfo = user[0];
     return (
         <div className='bill-container'>
             <div className='header'>
@@ -45,12 +47,17 @@ function billDetail(bill: BillWithData) {
             <Divider />
             <div className='content'>
                 <div className='own-firm-data'>
-                    <h6>Nosūtītājs:</h6>
-                    <h6>Juridiskā adrese:</h6>
-                    <h6>Norēķinu rekvizīti:</h6>
+                    <h6>Nosūtītājs: {userInfo.name}</h6>
+                    <h6>Juridiskā adrese: {userInfo.legalAdress}</h6>
+                    <h6>Norēķinu rekvizīti: {userInfo.bankName + " " + userInfo.account}</h6>
                 </div>
                 <Divider />
-
+                <div className='customer-data'>
+                    <h6>Preču saņēmējs: {bill.customer.clientName}</h6>
+                    <h6>Juridiskā adrese: {bill.customer.legalAdress}</h6>
+                    <h6>Norēķinu rekvizīti: {bill.customer.bankName + " " + bill.customer.account}</h6>
+                </div>
+                <Divider />
                 <div className='bill-items'>
                     <DataTable value={bill.billProducts} responsiveLayout="scroll">
                         <Column field="productName" header="Preču nosaukums"></Column>

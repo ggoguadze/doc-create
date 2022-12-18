@@ -59,8 +59,6 @@ function createInvoice({
         setDisplayInvoiceModal(!displayInvoiceModal);
     }
 
-
-
     const router = useRouter();
     function refreshPage() {
         router.replace(router.asPath);
@@ -135,10 +133,10 @@ function createInvoice({
                 <Column
                     body={(invoice: InvoiceWithCustomer) => {
                         return (
-                            <>
+                            <span className="p-buttonset">
                                 <Button onClick={() => previewDocument(invoice.id)} label="Apskatīt" icon="pi pi-file" />
                                 <Button onClick={() => deleteInvoice(invoice.id)} label="Dzēst" icon="pi pi-file" />
-                            </>
+                            </span>
                         );
                     }}
                 ></Column>

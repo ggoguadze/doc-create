@@ -10,6 +10,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const id = JSON.parse(req.body)
         const deletedDriver = await prisma.driver.delete({ where: { id: id } })
         res.json(deletedDriver)
+    } else if (req.method === 'PATCH') {
+        const body = JSON.parse(req.body)
+        const updatedDriver = await prisma.driver.update({ where: { id: body.id }, data: body.driver })
+        res.json(updatedDriver)
     }
 
 }

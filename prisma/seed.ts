@@ -140,7 +140,6 @@ const invoicesData: Prisma.InvoiceCreateInput[] = [
                 id: 1
             }
         },
-        discount: 0,
         status: 'UNSIGNED',
         createdBy: 'Jānis Bērzs',
         invoiceProducts: {
@@ -173,7 +172,6 @@ const invoicesData: Prisma.InvoiceCreateInput[] = [
                 id: 2
             }
         },
-        discount: 0,
         status: 'UNSIGNED',
         createdBy: 'Jānis Bērzs',
         invoiceProducts: {
@@ -199,7 +197,6 @@ const billsData: Prisma.BillCreateInput[] = [
                 id: 1
             }
         },
-        discount: 0,
         status: 'UNSIGNED',
         createdBy: 'Jānis Bērzs',
         billProducts: {
@@ -222,7 +219,6 @@ const billsData: Prisma.BillCreateInput[] = [
                 id: 2
             }
         },
-        discount: 0,
         status: 'UNSIGNED',
         createdBy: 'Jānis Bērzs',
         billProducts: {
@@ -235,6 +231,17 @@ const billsData: Prisma.BillCreateInput[] = [
                 }
             ],
         },
+    }
+]
+
+const userData: Prisma.UserCreateInput[] = [
+    {
+        name: 'SIA Ēdieni',
+        legalAdress: 'Lielā 3, Liepāja',
+        deliveryAdress: 'Lielā 3, Liepāja',
+        pvnCode: 'LV12345678901',
+        account: 'LV12HABA1234567890123',
+        bankName: 'Swedbank',
     }
 ]
 
@@ -276,6 +283,9 @@ async function main() {
         })
         console.log(`Created bill with id: ${invoice.id}`)
     }
+    await prisma.user.create({
+        data: userData[0],
+    })
     console.log(`Seeding finished.`)
 }
 

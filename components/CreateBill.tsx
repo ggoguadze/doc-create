@@ -18,8 +18,10 @@ function CreateBill(props: ICreateBillProps) {
                 </span>
             </div>
             <div className="form-footer">
-                <Button onClick={props.toggleItemForm} label="Saglabāt" icon="pi pi-save" />
-                <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                <span className="p-buttonset">
+                    <Button onClick={props.toggleItemForm} label="Saglabāt" icon="pi pi-save" />
+                    <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                </span>
             </div>
         </div>
     );

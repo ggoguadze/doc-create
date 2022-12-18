@@ -35,6 +35,16 @@ Table Transport {
   invoice Invoice [not null]
 }
 
+Table User {
+  id Int [pk, increment]
+  name String [not null]
+  legalAdress String [not null]
+  deliveryAdress String [not null]
+  pvnCode String [not null]
+  account String [not null]
+  bankName String [not null]
+}
+
 Table Invoice {
   id Int [pk, increment]
   dateCreated String [not null]
