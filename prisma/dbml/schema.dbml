@@ -57,7 +57,6 @@ Table Invoice {
   driverId Int [not null]
   transport Transport [not null]
   transportId Int [not null]
-  discount Float [not null]
   status String [not null]
   createdBy String [not null]
 }
@@ -70,7 +69,6 @@ Table Bill {
   billProducts BillProduct [not null]
   customer Customer [not null]
   customerId Int [not null]
-  discount Float [not null]
   status String [not null]
   createdBy String [not null]
 }

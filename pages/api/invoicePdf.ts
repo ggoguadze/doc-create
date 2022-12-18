@@ -1,21 +1,24 @@
-import { NextApiHandler } from 'next'
-const { chromium } = require('playwright')
+
+import { chromium } from 'playwright'
+import { NextApiRequest, NextApiResponse } from "next"
 
 
-
-
-const Handler: NextApiHandler = async (req, res) => {
-  const browser = await chromium.launch()
-  const page = await browser.newPage()
-
-  await page.goto('http://localhost:3000/invoice')
-  await page.emulateMediaType('screen')
-
-  const pdfBuffer = await page.pdf({ format: 'A4' })
-
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+    const browser = await chromium.launch()
+    const context = await browser.newContext()
+    const page = await context.newPage()
+    await page.emulateMedia({media:'screen'})
+    await page.goto(`http://localhost:3000/invoice/${req.id}`)
+    
+    await page.getByText('Pavadzīme').isVisible()
+      const pdfBuffer = await page.pdf({ format: 'A4' })
+      
+      await browser.close()
+  
+ // }
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Length', pdfBuffer.length)
+  console.log(pdfBuffer)
   res.send(pdfBuffer)
 
-  await browser.close()
 }
-
-export default Handler

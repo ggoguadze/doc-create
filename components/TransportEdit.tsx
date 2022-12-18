@@ -1,7 +1,7 @@
 import { InputText } from "primereact/inputtext";
 import * as React from "react";
 import { Button } from "primereact/button";
-import { ITransport } from "../pages/otherData";
+import { ITransport } from "../pages/transport";
 
 interface ITransportEditProps {
     saveTransport: (transport: ITransport) => void;
