@@ -190,7 +190,6 @@ const invoicesData: Prisma.InvoiceCreateInput[] = [
 const billsData: Prisma.BillCreateInput[] = [
     {
         dateCreated: new Date().toISOString(),
-        dateDelivered: new Date().toISOString(),
         datePaymentDue: new Date().toISOString(),
         customer: {
             connect: {
@@ -212,7 +211,6 @@ const billsData: Prisma.BillCreateInput[] = [
     },
     {
         dateCreated: new Date().toISOString(),
-        dateDelivered: new Date().toISOString(),
         datePaymentDue: new Date().toISOString(),
         customer: {
             connect: {

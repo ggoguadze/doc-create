@@ -5,6 +5,7 @@ import "primereact/resources/primereact.min.css"
 import "primeicons/primeicons.css"
 import "../styles/invoice.css";
 import "../styles/bill.css";
+import "../styles/loadingIndicator.css";
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/router'
 

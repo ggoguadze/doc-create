@@ -29,7 +29,6 @@ function clients({ customers }: { customers: Customer[] }) {
     const [selectedCustomer, setSelectedCustomer] = useState(0);
     const [customerEdit, setCustomerEdit] = useState<ICustomer | undefined>(undefined);
 
-
     function toggleItemForm() {
         setDisplayModal(!displayModal);
     }
@@ -102,18 +101,25 @@ function clients({ customers }: { customers: Customer[] }) {
             <span className="p-buttonset">
                 <Button onClick={onCreateCustomer} label="Jauns" icon="pi pi-file" />
                 <Button disabled={selectedCustomer === 0} onClick={onEditCustomer} label="Labot" icon="pi pi-pencil" />
-                <Button disabled={selectedCustomer === 0} onClick={() => deleteCustomer(selectedCustomer)} label="Dzēst" icon="pi pi-trash" />
+                <Button
+                    disabled={selectedCustomer === 0}
+                    onClick={() => deleteCustomer(selectedCustomer)}
+                    label="Dzēst"
+                    icon="pi pi-trash"
+                />
             </span>
 
             <DataTable
                 dataKey="id"
                 selectionMode="single"
                 selection={customers.find((customer) => customer.id === selectedCustomer)}
-                onSelectionChange={(e) => { e.value ? setSelectedCustomer(e.value.id) : setSelectedCustomer(0) }}
+                onSelectionChange={(e) => {
+                    e.value ? setSelectedCustomer(e.value.id) : setSelectedCustomer(0);
+                }}
                 value={customers}
                 emptyMessage="Nav datu"
             >
-                <Column style={{ width: '20px' }} selectionMode="single"></Column>
+                <Column style={{ width: "20px" }} selectionMode="single"></Column>
                 <Column field="clientName" header="Nosaukums"></Column>
                 <Column field="email" header="E-pasts"></Column>
                 <Column field="legalAdress" header="Adrese"></Column>
@@ -122,7 +128,7 @@ function clients({ customers }: { customers: Customer[] }) {
                 <Column field="pvnCode" header="PVN kods"></Column>
                 <Column field="account" header="Konta numurs"></Column>
             </DataTable>
-            <Dialog visible={displayModal} onHide={toggleItemForm}>
+            <Dialog visible={displayModal} onHide={toggleItemForm} closeOnEscape={false}>
                 <CustomerEdit selectedData={customerEdit} toggleItemForm={toggleItemForm} saveCustomer={saveCustomer} />
             </Dialog>
         </div>

@@ -9,7 +9,6 @@ import TransportEdit from "../components/TransportEdit";
 import { Transport } from "@prisma/client";
 import { GetServerSideProps } from "next";
 
-
 export interface ITransport {
     name: string;
     number: string;
@@ -100,21 +99,33 @@ function otherData({ transports }: { transports: Transport[] }) {
             <div className="transport-edit-container">
                 <span className="p-buttonset">
                     <Button onClick={onCreateTransport} label="Jauns" icon="pi pi-file" />
-                    <Button disabled={selectedTransport === 0} onClick={onEditTransport} label="Labot" icon="pi pi-pencil" />
-                    <Button disabled={selectedTransport === 0} onClick={() => deleteTransport(selectedTransport)} label="Dzēst" icon="pi pi-trash" />
+                    <Button
+                        disabled={selectedTransport === 0}
+                        onClick={onEditTransport}
+                        label="Labot"
+                        icon="pi pi-pencil"
+                    />
+                    <Button
+                        disabled={selectedTransport === 0}
+                        onClick={() => deleteTransport(selectedTransport)}
+                        label="Dzēst"
+                        icon="pi pi-trash"
+                    />
                 </span>
                 <DataTable
                     dataKey="id"
                     selection={transports.find((transport) => transport.id === selectedTransport)}
-                    onSelectionChange={(e) => { e.value ? setSelectedTransport(e.value.id) : setSelectedTransport(0) }}
+                    onSelectionChange={(e) => {
+                        e.value ? setSelectedTransport(e.value.id) : setSelectedTransport(0);
+                    }}
                     value={transports}
                     emptyMessage="Nav datu"
                 >
-                    <Column style={{ width: '20px' }} selectionMode="single"></Column>
+                    <Column style={{ width: "20px" }} selectionMode="single"></Column>
                     <Column field="name" header="Nosaukums"></Column>
                     <Column field="number" header="Reģistrācijas nummurs"></Column>
                 </DataTable>
-                <Dialog visible={displayTransportModal} onHide={toggleTransportItemForm}>
+                <Dialog visible={displayTransportModal} onHide={toggleTransportItemForm} closeOnEscape={false}>
                     <TransportEdit
                         selectedData={transportEdit}
                         toggleItemForm={toggleTransportItemForm}

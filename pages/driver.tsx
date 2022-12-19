@@ -27,8 +27,6 @@ function otherData({ drivers }: { drivers: Driver[] }) {
     const [selectedDriver, setSelectedDriver] = useState(0);
     const [driverEdit, setDriverEdit] = useState<IDriver | undefined>(undefined);
 
-
-
     function toggleDriverItemForm() {
         setDisplayDriverModal(!displayDriverModal);
     }
@@ -56,7 +54,6 @@ function otherData({ drivers }: { drivers: Driver[] }) {
             createDriver(driver);
         }
     }
-
 
     async function createDriver(driver: IDriver) {
         const response = await fetch("/api/driver", {
@@ -103,19 +100,26 @@ function otherData({ drivers }: { drivers: Driver[] }) {
                 <span className="p-buttonset">
                     <Button onClick={onCreateDriver} label="Jauns" icon="pi pi-file" />
                     <Button disabled={selectedDriver === 0} onClick={onEditDriver} label="Labot" icon="pi pi-pencil" />
-                    <Button disabled={selectedDriver === 0} onClick={() => deleteDriver(selectedDriver)} label="Dzēst" icon="pi pi-trash" />
+                    <Button
+                        disabled={selectedDriver === 0}
+                        onClick={() => deleteDriver(selectedDriver)}
+                        label="Dzēst"
+                        icon="pi pi-trash"
+                    />
                 </span>
                 <DataTable
                     dataKey="id"
                     selection={drivers.find((driver) => driver.id === selectedDriver)}
-                    onSelectionChange={(e) => { e.value ? setSelectedDriver(e.value.id) : setSelectedDriver(0) }}
+                    onSelectionChange={(e) => {
+                        e.value ? setSelectedDriver(e.value.id) : setSelectedDriver(0);
+                    }}
                     value={drivers}
                     emptyMessage="Nav datu"
                 >
-                    <Column style={{ width: '20px' }} selectionMode="single"></Column>
+                    <Column style={{ width: "20px" }} selectionMode="single"></Column>
                     <Column field="name" header="Vārds, Uzvārds"></Column>
                 </DataTable>
-                <Dialog visible={displayDriverModal} onHide={toggleDriverItemForm}>
+                <Dialog visible={displayDriverModal} onHide={toggleDriverItemForm} closeOnEscape={false}>
                     <DriverEdit
                         selectedData={driverEdit}
                         toggleItemForm={toggleDriverItemForm}

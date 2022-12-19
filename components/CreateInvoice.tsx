@@ -7,6 +7,7 @@ import { Calendar } from "primereact/calendar";
 import { DataTable } from "primereact/datatable";
 import { Column, ColumnEditorOptions } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 interface ICreateInvoiceProps {
     saveInvoice: (invoice: IInvoice) => void;
@@ -26,6 +27,7 @@ function CreateInvoice(props: ICreateInvoiceProps) {
     const [selectedProducts, setSelectedProducts] = useState<InvoiceProduct[]>([
         { id: 1, productName: "Produkts 1", quantity: 1, price: 2, unit: "kg", invoiceId: 1 }
     ]);
+    const { user } = useUser();
 
     function onInvoiceSave() {
         props.saveInvoice({
@@ -36,7 +38,7 @@ function CreateInvoice(props: ICreateInvoiceProps) {
             customerId: selectedCustomer.id,
             driverId: selectedDriver.id,
             transportId: selectedTransport.id,
-            createdBy: "admin",
+            createdBy: user?.name as string,
             products: selectedProducts
         });
         props.toggleItemForm();
@@ -81,33 +83,11 @@ function CreateInvoice(props: ICreateInvoiceProps) {
         }
     };
 
-    const cellEditor = (options: ColumnEditorOptions) => {
-        if (options.field === "quantity") return quantityEditor(options);
-        else return textEditor(options);
-    };
-
-    const textEditor = (options: ColumnEditorOptions) => {
-        //return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback && options.editorCallback(e.target.value)} />;
-        return (
-            <Dropdown
-                value={options.value}
-                options={props.products}
-                onChange={(e) => options.editorCallback && options.editorCallback(e.value)}
-                optionLabel="name"
-                filter
-                showClear
-                filterBy="name"
-                placeholder="Izvēlaties produktu"
-            />
-        );
-    };
-
     const quantityEditor = (options: ColumnEditorOptions) => {
         return (
             <InputNumber
                 value={options.value}
                 onValueChange={(e) => options.editorCallback && options.editorCallback(e.value)}
-                mode="decimal"
             />
         );
     };
@@ -119,10 +99,6 @@ function CreateInvoice(props: ICreateInvoiceProps) {
         _products[index] = newData;
 
         setSelectedProducts(_products);
-    };
-
-    const productsBodyTemplate = (rowData: any) => {
-        return rowData.productName;
     };
 
     const productsEditor = (options: ColumnEditorOptions) => {
@@ -186,41 +162,53 @@ function CreateInvoice(props: ICreateInvoiceProps) {
                         placeholder="Izvēlaties vadītāju"
                     />
                 </div>
+                <div className="form-item delivery-date">
+                    <span className="p-float-label">
+                        <Calendar
+                            required
+                            dateFormat="dd/mm/yy"
+                            id="basic"
+                            value={deliveryDate}
+                            onChange={(e) => setDeliveryDate(e.value)}
+                        />
+                        <label htmlFor="calendar">Piegādes datums</label>
+                    </span>
+                </div>
+                <div className="form-item payment-due-date">
+                    <span className="p-float-label">
+                        <Calendar
+                            style={{ width: "100%" }}
+                            required
+                            dateFormat="dd/mm/yy"
+                            id="basic"
+                            value={paymentDueDate}
+                            onChange={(e) => setPaymentDueDate(e.value)}
+                        />
+                        <label htmlFor="calendar">Maksājuma termiņš</label>
+                    </span>
+                </div>
+                <DataTable
+                    className="editable-cells-table"
+                    editMode="row"
+                    value={[
+                        ...selectedProducts,
+                        { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
+                    ]}
+                    onRowEditComplete={onRowEditComplete}
+                >
+                    <Column
+                        editor={(options) => productsEditor(options)}
+                        field="productName"
+                        header="Produkta nosaukums"
+                    />
+                    <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
+                    <Column
+                        rowEditor
+                        headerStyle={{ width: "10%", minWidth: "8rem" }}
+                        bodyStyle={{ textAlign: "center" }}
+                    ></Column>
+                </DataTable>
             </div>
-            <div className="form-item delivery-date">
-                <h6>Piegādes datums:</h6>
-                <Calendar
-                    required
-                    dateFormat="dd/mm/yy"
-                    id="basic"
-                    value={deliveryDate}
-                    onChange={(e) => setDeliveryDate(e.value)}
-                />
-            </div>
-            <div className="form-item payment-due-date">
-                <h6>Samaksāt līdz:</h6>
-                <Calendar
-                    required
-                    dateFormat="dd/mm/yy"
-                    id="basic"
-                    value={paymentDueDate}
-                    onChange={(e) => setPaymentDueDate(e.value)}
-                />
-            </div>
-            <DataTable
-                className="editable-cells-table"
-                editMode="row"
-                value={[...selectedProducts, { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }]}
-                onRowEditComplete={onRowEditComplete}
-            >
-                <Column editor={(options) => productsEditor(options)} field="productName" header="Produkta nosaukums" />
-                <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
-                <Column
-                    rowEditor
-                    headerStyle={{ width: "10%", minWidth: "8rem" }}
-                    bodyStyle={{ textAlign: "center" }}
-                ></Column>
-            </DataTable>
             <div className="form-footer">
                 <span className="p-buttonset">
                     <Button onClick={onInvoiceSave} label="Saglabāt" icon="pi pi-save" />

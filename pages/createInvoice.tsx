@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CreateInvoice from "../components/CreateInvoice";
+import { useEffect } from "react";
 
 export interface IInvoice {
     dateCreated: string;
@@ -18,7 +19,14 @@ export interface IInvoice {
     driverId: number;
     transportId: number;
     createdBy: string;
-    products: InvoiceProduct[];
+    products: IInvoiceProduct[];
+}
+
+interface IInvoiceProduct {
+    quantity: number;
+    productName: string;
+    price: number;
+    unit: string;
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
@@ -34,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     return { props: { customers, products, drivers, transports, invoice } };
 };
 
-type InvoiceWithCustomer = Invoice & { customer: Customer };
+export type InvoiceWithCustomer = Invoice & { customer: Customer };
 
 function createInvoice({
     customers,
@@ -50,9 +58,28 @@ function createInvoice({
     invoice: InvoiceWithCustomer[];
 }) {
     const [displayInvoiceModal, setDisplayInvoiceModal] = useState(false);
+    const [displaySigningModal, setDisplaySigningModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (displaySigningModal) {
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 3000);
+        }
+    }, [displaySigningModal]);
 
     function toggleInvoiceItemForm() {
         setDisplayInvoiceModal(!displayInvoiceModal);
+    }
+
+    function toggleSigningModal() {
+        setDisplaySigningModal(!displaySigningModal);
+    }
+
+    function closeSigningModal() {
+        setDisplaySigningModal(false);
+        updateInvoiceStatus();
     }
 
     const router = useRouter();
@@ -60,42 +87,58 @@ function createInvoice({
         router.replace(router.asPath);
     }
 
+    async function createInvoicePdfs() {
+        let blobArray: Blob[] = [];
+        for await (const inv of invoice) {
+            const response = await fetch("/api/invoicePdf", {
+                method: "POST",
+                body: JSON.stringify(inv.id)
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            blobArray.push(await response.blob());
+        }
+        return blobArray;
+    }
+
+    function downloadInvoices(pdfs: Blob[]) {
+        for (const [i, pdf] of pdfs.entries()) {
+            const url = URL.createObjectURL(pdf);
+            console.log(url, " url");
+            const a = document.createElement("a");
+            a.setAttribute("download", `Pavadzīme-${invoice[i].customer.clientName}${invoice[i].dateCreated}.pdf`);
+            a.setAttribute("href", url);
+            a.click();
+            URL.revokeObjectURL(url);
+            a.remove();
+        }
+    }
+
     async function signInvoice() {
-        // katram id savs requests
-        const respone = await fetch("/api/invoicePdf", {
-            method: "get",
-            body: JSON.stringify()
-        });
-        //respone is array of arrayBuffers, save each arrayBuffer as pdf
-        // const arrayBuffers = await respone.json();
-        // arrayBuffers.forEach((arrayBuffer: any, index: number) => {
-        //     const blob = new Blob([arrayBuffer], { type: "application/pdf" });
-        //     const url = URL.createObjectURL(blob);
-        //     const a = document.createElement("a");
-        //     a.setAttribute(
-        //         "download",
-        //         `invoice_${invoice[index].customer.clientName}_${invoice[index].dateCreated}.pdf`
-        //     );
-        //     a.setAttribute("href", url);
-        //     a.click();
-        // });
-
-        // refreshPage();
-        console.log(respone.body);
-        const blob = await respone.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.setAttribute("download", `invoice.pdf`);
-        a.setAttribute("href", url);
-        a.click();
-
-        refreshPage();
+        const pdfs = await createInvoicePdfs();
+        downloadInvoices(pdfs);
     }
 
     async function saveInvoice(invoice: IInvoice) {
         const response = await fetch("/api/invoice", {
             method: "POST",
             body: JSON.stringify(invoice)
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
+    async function updateInvoiceStatus() {
+        const response = await fetch("/api/invoice", {
+            method: "PATCH",
+            body: "SIGNED"
         });
 
         if (!response.ok) {
@@ -126,7 +169,24 @@ function createInvoice({
         <>
             <span className="p-buttonset">
                 <Button onClick={toggleInvoiceItemForm} label="Jauna pavadzīme" icon="pi pi-file" />
-                <Button disabled={invoice.length === 0} onClick={signInvoice} label="Parakstīt" icon="pi pi-print" />
+                {invoice.some((inv) => inv.status === "UNSIGNED") && (
+                    <Button
+                        onClick={() => {
+                            toggleSigningModal();
+                        }}
+                        label="Parakstīt"
+                        icon="pi pi-pencil"
+                    />
+                )}
+                {invoice.some((inv) => inv.status === "SIGNED") && (
+                    <Button
+                        onClick={() => {
+                            signInvoice();
+                        }}
+                        label="Lejupielādēt parakstītās"
+                        icon="pi pi-download"
+                    />
+                )}
             </span>
 
             <DataTable dataKey="id" selectionMode="single" value={invoice}>
@@ -152,10 +212,20 @@ function createInvoice({
                     }}
                 ></Column>
                 <Column
-                    field="customer"
+                    field="legalAdress"
                     header="Adrese"
                     body={(invoice: InvoiceWithCustomer) => {
                         return invoice.customer.legalAdress;
+                    }}
+                ></Column>
+                <Column
+                    field="statuss"
+                    header="Statuss"
+                    body={(invoice: InvoiceWithCustomer) => {
+                        if (invoice.status === "SIGNED") {
+                            return "Parakstīts";
+                        }
+                        return "Neparakstīts";
                     }}
                 ></Column>
                 <Column
@@ -167,7 +237,7 @@ function createInvoice({
                                     label="Apskatīt"
                                     icon="pi pi-file"
                                 />
-                                <Button onClick={() => deleteInvoice(invoice.id)} label="Dzēst" icon="pi pi-file" />
+                                <Button onClick={() => deleteInvoice(invoice.id)} label="Dzēst" icon="pi pi-trash" />
                             </span>
                         );
                     }}
@@ -175,9 +245,10 @@ function createInvoice({
             </DataTable>
             <div className="create-invoice">
                 <Dialog
-                    style={{ width: "50vw", height: "50vw" }}
+                    style={{ width: "60vw", height: "50vw" }}
                     visible={displayInvoiceModal}
                     onHide={toggleInvoiceItemForm}
+                    closeOnEscape={false}
                 >
                     <CreateInvoice
                         customers={customers}
@@ -187,6 +258,40 @@ function createInvoice({
                         toggleItemForm={toggleInvoiceItemForm}
                         saveInvoice={saveInvoice}
                     />
+                </Dialog>
+            </div>
+            <div className="simulatedEsigning">
+                <Dialog
+                    visible={displaySigningModal}
+                    onHide={toggleSigningModal}
+                    closeOnEscape={false}
+                    closable={false}
+                    maximized={true}
+                >
+                    <div className="simulatedEsigning-content">
+                        {isLoading && (
+                            <div className="lds-spinner">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                        )}
+
+                        <h1>Simulēts parakstīšanas process</h1>
+
+                        <Button onClick={() => closeSigningModal()} disabled={isLoading}>
+                            Atgriezties elektronisko dokumentu sagatavotājā{" "}
+                        </Button>
+                    </div>
                 </Dialog>
             </div>
         </>

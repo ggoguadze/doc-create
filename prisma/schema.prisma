@@ -77,7 +77,6 @@ model Invoice {
 model Bill {
   id             Int           @id @default(autoincrement())
   dateCreated    String
-  dateDelivered  String
   datePaymentDue String
   billProducts   BillProduct[]
   customer       Customer      @relation(fields: [customerId], references: [id])

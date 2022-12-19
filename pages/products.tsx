@@ -95,21 +95,28 @@ function products({ products }: { products: Products[] }) {
             <span className="p-buttonset">
                 <Button onClick={onCreateProduct} label="Jauns" icon="pi pi-file" />
                 <Button disabled={selectedProduct === 0} onClick={onEditProduct} label="Labot" icon="pi pi-pencil" />
-                <Button disabled={selectedProduct === 0} onClick={() => deleteProduct(selectedProduct)} label="Dzēst" icon="pi pi-trash" />
+                <Button
+                    disabled={selectedProduct === 0}
+                    onClick={() => deleteProduct(selectedProduct)}
+                    label="Dzēst"
+                    icon="pi pi-trash"
+                />
             </span>
             <DataTable
                 dataKey="id"
                 selection={products.find((product) => product.id === selectedProduct)}
-                onSelectionChange={(e) => { e.value ? setSelectedProduct(e.value.id) : setSelectedProduct(0) }}
+                onSelectionChange={(e) => {
+                    e.value ? setSelectedProduct(e.value.id) : setSelectedProduct(0);
+                }}
                 value={products}
                 emptyMessage="Nav datu"
             >
-                <Column style={{ width: '20px' }} selectionMode="single"></Column>
+                <Column style={{ width: "20px" }} selectionMode="single"></Column>
                 <Column field="name" header="Nosaukums"></Column>
                 <Column field="price" header="Cena"></Column>
                 <Column field="unit" header="Mērvienība"></Column>
             </DataTable>
-            <Dialog visible={displayModal} onHide={toggleItemForm}>
+            <Dialog visible={displayModal} onHide={toggleItemForm} closeOnEscape={false}>
                 <ProductsEdit selectedData={productEdit} toggleItemForm={toggleItemForm} saveProduct={saveProduct} />
             </Dialog>
         </div>
