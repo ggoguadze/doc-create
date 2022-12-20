@@ -2,6 +2,7 @@ import { InputText } from "primereact/inputtext";
 import * as React from "react";
 import { Button } from "primereact/button";
 import { ITransport } from "../pages/transport";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 interface ITransportEditProps {
     saveTransport: (transport: ITransport) => void;
@@ -21,11 +22,23 @@ function TransportEdit(props: ITransportEditProps) {
         props.toggleItemForm();
     }
 
+    const confirm = () => {
+        confirmDialog({
+            message: 'Vai tiešām vēlaties atcelt?',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Jā',
+            rejectLabel: 'Nē',
+            accept: props.toggleItemForm
+        });
+    };
+
     return (
         <>
+            <ConfirmDialog />
             <div className="form-content">
                 <span className="p-float-label">
                     <InputText
+                        style={{ width: "18rem" }}
                         id="transportName"
                         value={transportName}
                         onChange={(e) => setTransportName(e.target.value)}
@@ -34,13 +47,15 @@ function TransportEdit(props: ITransportEditProps) {
                 </span>
 
                 <span className="p-float-label">
-                    <InputText id="number" value={number} onChange={(e) => setNumber(e.target.value)} />
+                    <InputText style={{ width: "18rem" }} id="number" value={number} onChange={(e) => setNumber(e.target.value)} />
                     <label htmlFor="number">Reģistrācijas nummurs</label>
                 </span>
             </div>
             <div className="form-footer">
-                <Button onClick={onTransportSave} label="Saglabāt" icon="pi pi-save" />
-                <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                <span className="p-buttonset">
+                    <Button onClick={onTransportSave} label="Saglabāt" icon="pi pi-save" />
+                    <Button onClick={confirm} label="Atcelt" icon="pi pi-times" />
+                </span>
             </div>
         </>
     );

@@ -1,18 +1,33 @@
-.invoice-container {
+.invoice-view-container {
 	margin: 20px auto;
 	padding: 30px;
 	max-width: 600px;
 	min-height: 850px;
 	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-
+	display: flex;
+	flex-direction: column;
 }
 
+.invoice-container {
+	height: 210mm;
+	width: 297mm;
+}
+
+.invoice-container>.page {
+	margin: 15mm 15mm 15mm 25mm;
+	font: 14pt "Tahoma";
+	display: flex;
+	flex-direction: column;
+}
+
+.invoice-view-container .header,
 .invoice-container .header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 }
 
+.invoice-view-container .header .logo,
 .invoice-container .header .logo {
 	width: 100px;
 	height: 100px;
@@ -26,33 +41,40 @@
 	color: #000;
 }
 
+.invoice-view-container .content .own-firm-data,
 .invoice-container .content .own-firm-data {
 	display: flex;
 	flex-direction: column;
 	margin-top: 20px;
 }
 
+.invoice-view-container .footer,
 .invoice-container .footer {
 	display: flex;
 
 }
 
+.invoice-view-container .invoice-items,
 .invoice-container .invoice-items {
 	padding: 10px 0
 }
 
+.invoice-view-container .footer .issued-to,
 .invoice-container .footer .issued-to {
 	width: 300px;
 }
 
+.invoice-view-container .footer .issued-by,
 .invoice-container .footer .issued-by {
 	width: 300px;
 }
 
+.invoice-view-container h6,
 .invoice-container h6 {
 	margin: 0;
 }
 
+.invoice-view-container .invoice-items .p-column-title,
 .invoice-container .invoice-items .p-column-title {
 	font-weight: 500;
 	font-size: 12px;
@@ -61,6 +83,8 @@
 	line-height: 1;
 }
 
+.invoice-view-container .p-datatable .p-datatable-tbody>tr>td,
+.invoice-view-container .p-datatable .p-datatable-thead>tr>th,
 .invoice-container .p-datatable .p-datatable-tbody>tr>td,
 .invoice-container .p-datatable .p-datatable-thead>tr>th {
 	padding: 5px;

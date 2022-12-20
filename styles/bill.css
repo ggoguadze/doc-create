@@ -1,18 +1,34 @@
-.bill-container {
+.bill-view-container {
     margin: 20px auto;
     padding: 30px;
     max-width: 600px;
     min-height: 850px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    display: flex;
+    flex-direction: column;
+}
+
+.bill-container {
+    height: 210mm;
+    width: 297mm;
 
 }
 
+.bill-container>.page {
+    margin: 15mm 15mm 15mm 25mm;
+    font: 14pt "Tahoma";
+    display: flex;
+    flex-direction: column;
+}
+
+.bill-view-container .header,
 .bill-container .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+.bill-view-container .header .logo,
 .bill-container .header .logo {
     width: 100px;
     height: 100px;
@@ -26,33 +42,40 @@
     color: #000;
 }
 
+.bill-view-container .content .own-firm-data,
 .bill-container .content .own-firm-data {
     display: flex;
     flex-direction: column;
     margin-top: 20px;
 }
 
+.bill-view-container .footer,
 .bill-container .footer {
     display: flex;
-
+    margin-top: auto;
 }
 
+.bill-view-container .bill-items,
 .bill-container .bill-items {
     padding: 10px 0
 }
 
+.bill-view-container .footer .issued-to,
 .bill-container .footer .issued-to {
     width: 300px;
 }
 
+.bill-view-container .footer .issued-by,
 .bill-container .footer .issued-by {
     width: 300px;
 }
 
+.bill-view-container h6,
 .bill-container h6 {
     margin: 0;
 }
 
+.bill-view-container .bill-items .p-column-title,
 .bill-container .bill-items .p-column-title {
     font-weight: 500;
     font-size: 12px;
@@ -61,6 +84,8 @@
     line-height: 1;
 }
 
+.bill-view-container .p-datatable .p-datatable-tbody>tr>td,
+.bill-view-container .p-datatable .p-datatable-thead>tr>th,
 .bill-container .p-datatable .p-datatable-tbody>tr>td,
 .bill-container .p-datatable .p-datatable-thead>tr>th {
     padding: 5px;

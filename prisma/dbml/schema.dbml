@@ -64,7 +64,6 @@ Table Invoice {
 Table Bill {
   id Int [pk, increment]
   dateCreated String [not null]
-  dateDelivered String [not null]
   datePaymentDue String [not null]
   billProducts BillProduct [not null]
   customer Customer [not null]

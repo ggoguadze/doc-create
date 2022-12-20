@@ -162,7 +162,7 @@ function createInvoice({
     }
 
     function previewDocument(id: number) {
-        router.push(`/invoice/${id}`);
+        router.push(`/invoice/view/${id}`);
     }
 
     return (
@@ -245,10 +245,13 @@ function createInvoice({
             </DataTable>
             <div className="create-invoice">
                 <Dialog
-                    style={{ width: "60vw", height: "50vw" }}
+                    blockScroll={true}
+                    style={{ width: "60vw" }}
                     visible={displayInvoiceModal}
                     onHide={toggleInvoiceItemForm}
                     closeOnEscape={false}
+                    closable={false}
+                    draggable={false}
                 >
                     <CreateInvoice
                         customers={customers}
@@ -262,11 +265,13 @@ function createInvoice({
             </div>
             <div className="simulatedEsigning">
                 <Dialog
+                    blockScroll={true}
                     visible={displaySigningModal}
                     onHide={toggleSigningModal}
                     closeOnEscape={false}
                     closable={false}
                     maximized={true}
+                    draggable={false}
                 >
                     <div className="simulatedEsigning-content">
                         {isLoading && (

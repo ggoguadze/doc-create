@@ -33,17 +33,29 @@ a {
 .form-content>span {
   margin-bottom: 40px;
 }
+
 .form-content>div {
   margin-bottom: 20px;
 }
 
-.form-footer {
- display: flex;
- align-self: center ;
- position:sticky;
- bottom: 0;
+.form-content .form-selector-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
+.form-selector-container .form-item {
+  padding-bottom: 30px;
+}
+
+.form-selector-container .form-dropdown-selectors {
+  margin-right: 30px;
+}
+
+.form-footer {
+  display: flex;
+  align-self: center;
+}
 
 .simulatedEsigning-content {
   display: flex;

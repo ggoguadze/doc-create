@@ -119,7 +119,7 @@ function otherData({ drivers }: { drivers: Driver[] }) {
                     <Column style={{ width: "20px" }} selectionMode="single"></Column>
                     <Column field="name" header="Vārds, Uzvārds"></Column>
                 </DataTable>
-                <Dialog visible={displayDriverModal} onHide={toggleDriverItemForm} closeOnEscape={false}>
+                <Dialog blockScroll={true} draggable={false} closable={false} visible={displayDriverModal} onHide={toggleDriverItemForm} closeOnEscape={false}>
                     <DriverEdit
                         selectedData={driverEdit}
                         toggleItemForm={toggleDriverItemForm}

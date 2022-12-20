@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { IProduct } from "../pages/products";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 interface IProductsEditProps {
     saveProduct: (product: IProduct) => void;
@@ -15,6 +16,16 @@ function ProductsEdit(props: IProductsEditProps) {
     const [productName, setProductName] = React.useState(props.selectedData?.name ?? "");
     const [price, setPrice] = React.useState(props.selectedData?.price ?? null);
     const [unit, setUnit] = React.useState(props.selectedData?.unit ?? "");
+
+    const confirm = () => {
+        confirmDialog({
+            message: 'Vai tiešām vēlaties atcelt?',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Jā',
+            rejectLabel: 'Nē',
+            accept: props.toggleItemForm
+        });
+    };
 
     function onCustomerSave() {
         props.saveProduct({
@@ -37,14 +48,16 @@ function ProductsEdit(props: IProductsEditProps) {
 
     return (
         <>
+            <ConfirmDialog />
             <div className="form-content">
                 <span className="p-float-label">
-                    <InputText id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} />
+                    <InputText style={{ width: "18rem" }} id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} />
                     <label htmlFor="productName">Nosaukums</label>
                 </span>
 
                 <span className="p-float-label">
                     <InputNumber
+                        style={{ width: "18rem" }}
                         inputId="currency-latvia"
                         mode="currency"
                         currency="EUR"
@@ -58,6 +71,7 @@ function ProductsEdit(props: IProductsEditProps) {
 
                 <span className="p-float-label">
                     <Dropdown
+                        style={{ width: "18rem" }}
                         value={unit}
                         options={options}
                         onChange={onUnitChange}
@@ -69,7 +83,7 @@ function ProductsEdit(props: IProductsEditProps) {
             <div className="form-footer">
                 <span className="p-buttonset">
                     <Button onClick={onCustomerSave} label="Saglabāt" icon="pi pi-save" />
-                    <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
+                    <Button onClick={confirm} label="Atcelt" icon="pi pi-times" />
                 </span>
             </div>
         </>

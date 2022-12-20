@@ -116,7 +116,7 @@ function products({ products }: { products: Products[] }) {
                 <Column field="price" header="Cena"></Column>
                 <Column field="unit" header="Mērvienība"></Column>
             </DataTable>
-            <Dialog visible={displayModal} onHide={toggleItemForm} closeOnEscape={false}>
+            <Dialog blockScroll={true} draggable={false} closable={false} visible={displayModal} onHide={toggleItemForm} closeOnEscape={false}>
                 <ProductsEdit selectedData={productEdit} toggleItemForm={toggleItemForm} saveProduct={saveProduct} />
             </Dialog>
         </div>

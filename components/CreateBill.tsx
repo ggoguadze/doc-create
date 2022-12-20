@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { IBill } from "../pages/createBill";
 import { Customer, Products, BillProduct } from "@prisma/client";
 import { useState } from "react";
@@ -9,6 +8,7 @@ import { DataTable } from "primereact/datatable";
 import { Column, ColumnEditorOptions } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 interface ICreateBillProps {
     saveBill: (bill: IBill) => void;
@@ -24,6 +24,16 @@ function CreateBill(props: ICreateBillProps) {
         { id: 1, productName: "Produkts 1", quantity: 1, price: 2, unit: "kg", billId: 1 }
     ]);
     const { user } = useUser();
+
+    const confirm = () => {
+        confirmDialog({
+            message: 'Vai tiešām vēlaties atcelt?',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Jā',
+            rejectLabel: 'Nē',
+            accept: props.toggleItemForm
+        });
+    };
 
     function onBillSave() {
         props.saveBill({
@@ -81,61 +91,67 @@ function CreateBill(props: ICreateBillProps) {
     };
 
     return (
-        <div className="create-bill-container">
-            <div className="form-content">
-                <div className="form-item customer-select">
-                    <Dropdown
-                        value={selectedCustomer}
-                        options={props.customers}
-                        onChange={onCustomerChange}
-                        optionLabel="clientName"
-                        filter
-                        showClear
-                        filterBy="clientName"
-                        placeholder="Izvēlaties klientu"
-                    />
-                </div>
-                <div className="form-item payment-due-date">
-                    <span className="p-float-label">
-                        <Calendar
-                            required
-                            dateFormat="dd/mm/yy"
-                            id="basic"
-                            value={paymentDueDate}
-                            onChange={(e) => setPaymentDueDate(e.value)}
+        <>
+            <ConfirmDialog />
+            <div className="create-bill-container">
+                <div className="form-content">
+                    <div className="form-item customer-select">
+                        <Dropdown
+                            value={selectedCustomer}
+                            options={props.customers}
+                            onChange={onCustomerChange}
+                            optionLabel="clientName"
+                            filter
+                            showClear
+                            filterBy="clientName"
+                            placeholder="Izvēlaties klientu"
+                            style={{ width: "18rem" }}
                         />
-                        <label htmlFor="calendar">Maksājuma termiņš</label>
+                    </div>
+                    <div className="form-item payment-due-date">
+                        <span className="p-float-label">
+                            <Calendar
+                                required
+                                dateFormat="dd/mm/yy"
+                                id="basic"
+                                value={paymentDueDate}
+                                onChange={(e) => setPaymentDueDate(e.value)}
+                                style={{ width: "18rem" }}
+                            />
+                            <label htmlFor="calendar">Maksājuma termiņš</label>
+                        </span>
+                    </div>
+                    <DataTable
+                        className="editable-cells-table"
+                        editMode="row"
+                        value={[
+                            ...selectedProducts,
+                            { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
+                        ]}
+                        onRowEditComplete={onRowEditComplete}
+                        style={{ width: "90%" }}
+                    >
+                        <Column
+                            editor={(options) => productsEditor(options)}
+                            field="productName"
+                            header="Produkta nosaukums"
+                        />
+                        <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
+                        <Column
+                            rowEditor
+                            headerStyle={{ width: "10%", minWidth: "8rem" }}
+                            bodyStyle={{ textAlign: "center" }}
+                        ></Column>
+                    </DataTable>
+                </div>
+                <div className="form-footer">
+                    <span className="p-buttonset">
+                        <Button onClick={onBillSave} label="Saglabāt" icon="pi pi-save" />
+                        <Button onClick={confirm} label="Atcelt" icon="pi pi-times" />
                     </span>
                 </div>
-                <DataTable
-                    className="editable-cells-table"
-                    editMode="row"
-                    value={[
-                        ...selectedProducts,
-                        { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
-                    ]}
-                    onRowEditComplete={onRowEditComplete}
-                >
-                    <Column
-                        editor={(options) => productsEditor(options)}
-                        field="productName"
-                        header="Produkta nosaukums"
-                    />
-                    <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
-                    <Column
-                        rowEditor
-                        headerStyle={{ width: "10%", minWidth: "8rem" }}
-                        bodyStyle={{ textAlign: "center" }}
-                    ></Column>
-                </DataTable>
             </div>
-            <div className="form-footer">
-                <span className="p-buttonset">
-                    <Button onClick={onBillSave} label="Saglabāt" icon="pi pi-save" />
-                    <Button onClick={props.toggleItemForm} label="Atcelt" icon="pi pi-times" />
-                </span>
-            </div>
-        </div>
+        </>
     );
 }
 

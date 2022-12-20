@@ -125,7 +125,7 @@ function otherData({ transports }: { transports: Transport[] }) {
                     <Column field="name" header="Nosaukums"></Column>
                     <Column field="number" header="Reģistrācijas nummurs"></Column>
                 </DataTable>
-                <Dialog visible={displayTransportModal} onHide={toggleTransportItemForm} closeOnEscape={false}>
+                <Dialog blockScroll={true} draggable={false} closable={false} visible={displayTransportModal} onHide={toggleTransportItemForm} closeOnEscape={false}>
                     <TransportEdit
                         selectedData={transportEdit}
                         toggleItemForm={toggleTransportItemForm}

@@ -152,7 +152,7 @@ function createBill({
     }
 
     function previewDocument(id: number) {
-        router.push(`/bill/${id}`);
+        router.push(`/bill/view/${id}`);
     }
 
     return (
@@ -231,10 +231,13 @@ function createBill({
             </DataTable>
             <div className="create-bill">
                 <Dialog
+                    blockScroll={true}
                     visible={displayBillModal}
                     onHide={toggleBillItemForm}
-                    style={{ width: "60vw", height: "50vw" }}
+                    style={{ width: "60vw" }}
                     closeOnEscape={false}
+                    closable={false}
+                    draggable={false}
                 >
                     <CreateBill
                         toggleItemForm={toggleBillItemForm}
@@ -247,11 +250,13 @@ function createBill({
 
             <div className="simulatedEsigning">
                 <Dialog
+                    blockScroll={true}
                     visible={displaySigningModal}
                     onHide={toggleSigningModal}
                     closeOnEscape={false}
                     closable={false}
                     maximized={true}
+                    draggable={false}
                 >
                     <div className="simulatedEsigning-content">
                         {isLoading && (
