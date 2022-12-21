@@ -5,7 +5,7 @@ import styles from '../styles/Layout.module.css'
 
 export default function Home() {
   return (
-    <div>
+    <div className='welcome-page'>
       <h1>Sveicināti elektronisko dokumentu sagatavotājā</h1>
     </div>
   )

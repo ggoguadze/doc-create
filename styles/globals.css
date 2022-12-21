@@ -68,3 +68,9 @@ a {
   /* bring your own prefixes */
   transform: translate(-50%, -50%);
 }
+
+.welcome-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
