@@ -30,7 +30,7 @@ a {
   padding: 10px !important;
 }
 
-.form-content>span {
+.form-content .form-entry {
   margin-bottom: 40px;
 }
 

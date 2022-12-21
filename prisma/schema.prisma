@@ -26,6 +26,7 @@ model Customer {
   bankName       String
   invoice        Invoice[]
   bill           Bill[]
+  isDeleted      Boolean   @default(false)
 }
 
 model Products {

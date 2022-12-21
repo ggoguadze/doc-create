@@ -9,10 +9,6 @@ import DriverEdit from "../components/DriverEdit";
 import { Driver } from "@prisma/client";
 import { GetServerSideProps } from "next";
 
-export interface ITransport {
-    name: string;
-    number: string;
-}
 export interface IDriver {
     name: string;
 }
@@ -119,7 +115,14 @@ function otherData({ drivers }: { drivers: Driver[] }) {
                     <Column style={{ width: "20px" }} selectionMode="single"></Column>
                     <Column field="name" header="Vārds, Uzvārds"></Column>
                 </DataTable>
-                <Dialog blockScroll={true} draggable={false} closable={false} visible={displayDriverModal} onHide={toggleDriverItemForm} closeOnEscape={false}>
+                <Dialog
+                    blockScroll={true}
+                    draggable={false}
+                    closable={false}
+                    visible={displayDriverModal}
+                    onHide={toggleDriverItemForm}
+                    closeOnEscape={false}
+                >
                     <DriverEdit
                         selectedData={driverEdit}
                         toggleItemForm={toggleDriverItemForm}

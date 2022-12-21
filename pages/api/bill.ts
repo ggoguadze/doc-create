@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "../../prisma"
-import { IBill } from "../createBill"
+import { IFullBill } from "../createBill"
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const bill: IBill = JSON.parse(req.body)
+        const bill: IFullBill = JSON.parse(req.body)
         const {products, ...rest} = bill
         const savedBill = await prisma.bill.create({ data: { ...rest, billProducts: { create: products.map((product)=>({productName: product.productName, quantity:product.quantity, price: product.price, unit: product.unit})) } } })
         res.json(savedBill)

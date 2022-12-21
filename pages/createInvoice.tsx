@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import React, { useState } from "react";
 import { prisma } from "../prisma";
-import { Driver, Transport, Customer, Products, Invoice, InvoiceProduct } from "@prisma/client";
+import { Driver, Transport, Customer, Products, Invoice } from "@prisma/client";
 import { useRouter } from "next/router";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -11,15 +11,18 @@ import CreateInvoice from "../components/CreateInvoice";
 import { useEffect } from "react";
 
 export interface IInvoice {
-    dateCreated: string;
     dateDelivered: string;
     datePaymentDue: string;
-    status: string;
     customerId: number;
     driverId: number;
     transportId: number;
-    createdBy: string;
     products: IInvoiceProduct[];
+}
+
+export interface IFullInvoice extends IInvoice {
+    status: string;
+    createdBy: string;
+    dateCreated: string;
 }
 
 interface IInvoiceProduct {
@@ -109,7 +112,12 @@ function createInvoice({
             const url = URL.createObjectURL(pdf);
             console.log(url, " url");
             const a = document.createElement("a");
-            a.setAttribute("download", `Pavadzīme-${invoice[i].customer.clientName}${invoice[i].dateCreated}.pdf`);
+            a.setAttribute(
+                "download",
+                `Pavadzīme-${invoice[i].customer.clientName}${new Date(
+                    invoice[i].dateCreated
+                ).toLocaleDateString()}.pdf`
+            );
             a.setAttribute("href", url);
             a.click();
             URL.revokeObjectURL(url);
@@ -149,6 +157,7 @@ function createInvoice({
     }
 
     async function deleteInvoice(id: number) {
+        console.log(id, " id");
         const response = await fetch("/api/invoice", {
             method: "DELETE",
             body: JSON.stringify(id)

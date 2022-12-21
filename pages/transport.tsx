@@ -13,9 +13,6 @@ export interface ITransport {
     name: string;
     number: string;
 }
-export interface IDriver {
-    name: string;
-}
 
 export const getServerSideProps: GetServerSideProps = async () => {
     const transports = await prisma.transport.findMany();
@@ -125,7 +122,14 @@ function otherData({ transports }: { transports: Transport[] }) {
                     <Column field="name" header="Nosaukums"></Column>
                     <Column field="number" header="Reģistrācijas nummurs"></Column>
                 </DataTable>
-                <Dialog blockScroll={true} draggable={false} closable={false} visible={displayTransportModal} onHide={toggleTransportItemForm} closeOnEscape={false}>
+                <Dialog
+                    blockScroll={true}
+                    draggable={false}
+                    closable={false}
+                    visible={displayTransportModal}
+                    onHide={toggleTransportItemForm}
+                    closeOnEscape={false}
+                >
                     <TransportEdit
                         selectedData={transportEdit}
                         toggleItemForm={toggleTransportItemForm}

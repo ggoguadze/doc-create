@@ -1,4 +1,4 @@
-import Layout from '../components/Layout'
+import Layout from '../components/Layout.tsx'
 import '../styles/globals.css'
 import "primereact/resources/themes/saga-blue/theme.css"
 import "primereact/resources/primereact.min.css"
@@ -13,7 +13,6 @@ import { useRouter } from 'next/router'
 function MyApp({ Component, pageProps }) {
 
 const router = useRouter();
-//console.log(router.pathname)
 if(router.pathname==="/invoice/[invoiceId]" || router.pathname==="/bill/[billId]"){
   return (
     <Component {...pageProps} />

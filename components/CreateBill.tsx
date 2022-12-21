@@ -1,55 +1,80 @@
 import { Button } from "primereact/button";
-import { IBill } from "../pages/createBill";
+import { IBill, IFullBill } from "../pages/createBill";
 import { Customer, Products, BillProduct } from "@prisma/client";
 import { useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { Calendar } from "primereact/calendar";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowEditCompleteParams } from "primereact/datatable";
 import { Column, ColumnEditorOptions } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from "primereact/confirmdialog";
+import { useFormik } from "formik";
+import { classNames } from "primereact/utils";
 
 interface ICreateBillProps {
-    saveBill: (bill: IBill) => void;
+    saveBill: (bill: IFullBill) => void;
     toggleItemForm: () => void;
     customers: Customer[];
     products: Products[];
 }
 
 function CreateBill(props: ICreateBillProps) {
-    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-    const [paymentDueDate, setPaymentDueDate] = useState<Date | Date[] | undefined | null | string>(undefined);
-    const [selectedProducts, setSelectedProducts] = useState<BillProduct[]>([
-        { id: 1, productName: "Produkts 1", quantity: 1, price: 2, unit: "kg", billId: 1 }
-    ]);
     const { user } = useUser();
+
+    const formik = useFormik<IBill>({
+        initialValues: {
+            datePaymentDue: "",
+            customerId: 0,
+            products: []
+        },
+        validate: (data) => {
+            let errors = {} as any;
+
+            if (!data.datePaymentDue) {
+                errors.datePaymentDue = "Izvēlieties maksājuma termiņu.";
+            }
+            if (!data.customerId) {
+                errors.customerId = "Izvēlieties klientu.";
+            }
+            if (!data.products.length) {
+                errors.products = "Izvēlieties produktus.";
+            }
+
+            return errors;
+        },
+        onSubmit: (data) => {
+            onBillSave(data);
+        }
+    });
+
+    const isFormFieldValid = (name: keyof typeof formik.touched) => !!(formik.touched[name] && formik.errors[name]);
+    const getFormErrorMessage = (name: keyof typeof formik.touched) => {
+        //@ts-expect-error
+        return isFormFieldValid(name) && <small className="p-error">{formik.errors[name]}</small>;
+    };
 
     const confirm = () => {
         confirmDialog({
-            message: 'Vai tiešām vēlaties atcelt?',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Jā',
-            rejectLabel: 'Nē',
+            message: "Vai tiešām vēlaties atcelt?",
+            icon: "pi pi-exclamation-triangle",
+            acceptLabel: "Jā",
+            rejectLabel: "Nē",
             accept: props.toggleItemForm
         });
     };
 
-    function onBillSave() {
+    function onBillSave(data: IBill) {
         props.saveBill({
             dateCreated: new Date().toISOString(),
-            datePaymentDue: paymentDueDate as string,
+            datePaymentDue: data.datePaymentDue,
             status: "UNSIGNED",
-            customerId: selectedCustomer.id,
+            customerId: data.customerId,
             createdBy: user?.name as string,
-            products: selectedProducts
+            products: data.products
         });
         props.toggleItemForm();
     }
-
-    const onCustomerChange = (e: { value: any }) => {
-        setSelectedCustomer(e.value);
-    };
 
     const quantityEditor = (options: ColumnEditorOptions) => {
         return (
@@ -60,13 +85,13 @@ function CreateBill(props: ICreateBillProps) {
         );
     };
 
-    const onRowEditComplete = (e: any) => {
-        let _products = [...selectedProducts];
+    const onRowEditComplete = (e: DataTableRowEditCompleteParams) => {
+        let products = [...formik.values.products];
         let { newData, index } = e;
 
-        _products[index] = newData;
+        products[index] = newData;
 
-        setSelectedProducts(_products);
+        formik.setFieldValue("products", products);
     };
 
     const productsEditor = (options: ColumnEditorOptions) => {
@@ -92,65 +117,81 @@ function CreateBill(props: ICreateBillProps) {
 
     return (
         <>
-            <ConfirmDialog />
-            <div className="create-bill-container">
-                <div className="form-content">
-                    <div className="form-item customer-select">
-                        <Dropdown
-                            value={selectedCustomer}
-                            options={props.customers}
-                            onChange={onCustomerChange}
-                            optionLabel="clientName"
-                            filter
-                            showClear
-                            filterBy="clientName"
-                            placeholder="Izvēlaties klientu"
-                            style={{ width: "18rem" }}
-                        />
-                    </div>
-                    <div className="form-item payment-due-date">
-                        <span className="p-float-label">
-                            <Calendar
-                                required
-                                dateFormat="dd/mm/yy"
-                                id="basic"
-                                value={paymentDueDate}
-                                onChange={(e) => setPaymentDueDate(e.value)}
+            <form onSubmit={formik.handleSubmit} className="p-fluid">
+                <div className="create-bill-container">
+                    <div className="form-content">
+                        <div className="form-item customer-select">
+                            <Dropdown
+                                id="customerId"
+                                value={formik.values.customerId}
+                                options={props.customers.map((c) => {
+                                    return { label: c.clientName, value: c.id };
+                                })}
+                                onChange={formik.handleChange}
+                                optionLabel="label"
+                                filter
+                                showClear
+                                filterBy="label"
+                                placeholder="Izvēlaties klientu"
                                 style={{ width: "18rem" }}
                             />
-                            <label htmlFor="calendar">Maksājuma termiņš</label>
+                            <label
+                                htmlFor="clientName"
+                                className={classNames({ "p-error": isFormFieldValid("customerId") })}
+                            ></label>
+                            {getFormErrorMessage("customerId")}
+                        </div>
+                        <div className="form-item payment-due-date">
+                            <span className="p-float-label">
+                                <Calendar
+                                    dateFormat="dd/mm/yy"
+                                    id="datePaymentDue"
+                                    value={formik.values.datePaymentDue}
+                                    onChange={formik.handleChange}
+                                    style={{ width: "18rem" }}
+                                />
+                                <label
+                                    htmlFor="datePaymentDue"
+                                    className={classNames({ "p-error": isFormFieldValid("datePaymentDue") })}
+                                >
+                                    Maksājuma termiņš
+                                </label>
+                            </span>
+                            {getFormErrorMessage("datePaymentDue")}
+                        </div>
+                        <DataTable
+                            id="products"
+                            className="editable-cells-table"
+                            editMode="row"
+                            value={[
+                                ...formik.values.products,
+                                { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
+                            ]}
+                            onRowEditComplete={onRowEditComplete}
+                            style={{ width: "90%" }}
+                        >
+                            <Column
+                                editor={(options) => productsEditor(options)}
+                                field="productName"
+                                header="Produkta nosaukums"
+                            />
+                            <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
+                            <Column
+                                rowEditor
+                                headerStyle={{ width: "10%", minWidth: "8rem" }}
+                                bodyStyle={{ textAlign: "center" }}
+                            ></Column>
+                        </DataTable>
+                        {getFormErrorMessage("products")}
+                    </div>
+                    <div className="form-footer">
+                        <span className="p-buttonset">
+                            <Button type="submit" label="Saglabāt" icon="pi pi-save" />
+                            <Button type="button" onClick={confirm} label="Atcelt" icon="pi pi-times" />
                         </span>
                     </div>
-                    <DataTable
-                        className="editable-cells-table"
-                        editMode="row"
-                        value={[
-                            ...selectedProducts,
-                            { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
-                        ]}
-                        onRowEditComplete={onRowEditComplete}
-                        style={{ width: "90%" }}
-                    >
-                        <Column
-                            editor={(options) => productsEditor(options)}
-                            field="productName"
-                            header="Produkta nosaukums"
-                        />
-                        <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
-                        <Column
-                            rowEditor
-                            headerStyle={{ width: "10%", minWidth: "8rem" }}
-                            bodyStyle={{ textAlign: "center" }}
-                        ></Column>
-                    </DataTable>
                 </div>
-                <div className="form-footer">
-                    <span className="p-buttonset">
-                        <Button onClick={onBillSave} label="Saglabāt" icon="pi pi-save" />
-                        <Button onClick={confirm} label="Atcelt" icon="pi pi-times" />
-                    </span>
-                </div>
-            </div>
+            </form>
         </>
     );
 }

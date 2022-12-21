@@ -39,7 +39,7 @@ function invoiceDetail({ invoice, user }: { invoice: InvoiceWithCustomer; user: 
                     <div className="logo">
                         <img src="/logo.png" alt="logo" />
                     </div>
-                    <div className="date-created">{new Date(invoice.dateCreated).toLocaleString()}</div>
+                    <div className="date-created">{new Date(invoice.dateCreated).toLocaleDateString()}</div>
                     <div className="invoice-number">
                         <h3>Pavadzīme</h3> Nr. {invoice.id.toString().padStart(4, "0")}
                     </div>
@@ -124,7 +124,7 @@ function invoiceDetail({ invoice, user }: { invoice: InvoiceWithCustomer; user: 
                         <h6>Izsniedza</h6>
                         <h6>Vārds, uzvārds: {invoice.createdBy}</h6>
                         <h6>Paraksts: {invoice.status === "SIGNED" ? "PARAKSTĪTS" : ""}</h6>
-                        <h6>Datums: </h6>
+                        <h6>Datums: {new Date(invoice.dateCreated).toLocaleDateString()} </h6>
                     </div>
                     <Divider layout="vertical" />
                     <div className="issued-to">

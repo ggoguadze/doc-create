@@ -10,12 +10,15 @@ import { Column } from "primereact/column";
 import CreateBill from "../components/CreateBill";
 
 export interface IBill {
-    dateCreated: string;
     datePaymentDue: string;
-    status: string;
     customerId: number;
-    createdBy: string;
     products: IBillProduct[];
+}
+
+export interface IFullBill extends IBill {
+    status: string;
+    createdBy: string;
+    dateCreated: string;
 }
 
 interface IBillProduct {
@@ -99,7 +102,10 @@ function createBill({
             const url = URL.createObjectURL(pdf);
             console.log(url, " url");
             const a = document.createElement("a");
-            a.setAttribute("download", `Rēķins-${bill[i].customer.clientName}${bill[i].dateCreated}.pdf`);
+            a.setAttribute(
+                "download",
+                `Rēķins-${bill[i].customer.clientName}${new Date(bill[i].dateCreated).toLocaleDateString()}.pdf`
+            );
             a.setAttribute("href", url);
             a.click();
             URL.revokeObjectURL(url);

@@ -1,17 +1,18 @@
 import { Button } from "primereact/button";
-import { IInvoice } from "../pages/createInvoice";
+import { IFullInvoice, IInvoice } from "../pages/createInvoice";
 import { Dropdown } from "primereact/dropdown";
-import { Driver, Transport, Customer, Products, InvoiceProduct } from "@prisma/client";
-import { useState } from "react";
+import { Driver, Transport, Customer, Products } from "@prisma/client";
 import { Calendar } from "primereact/calendar";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowEditCompleteParams } from "primereact/datatable";
 import { Column, ColumnEditorOptions } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from "primereact/confirmdialog";
+import { useFormik } from "formik";
+import { classNames } from "primereact/utils";
 
 interface ICreateInvoiceProps {
-    saveInvoice: (invoice: IInvoice) => void;
+    saveInvoice: (invoice: IFullInvoice) => void;
     toggleItemForm: () => void;
     customers: Customer[];
     drivers: Driver[];
@@ -20,52 +21,76 @@ interface ICreateInvoiceProps {
 }
 
 function CreateInvoice(props: ICreateInvoiceProps) {
-    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-    const [selectedTransport, setSelectedTransport] = useState<any>(null);
-    const [selectedDriver, setSelectedDriver] = useState<any>(null);
-    const [deliveryDate, setDeliveryDate] = useState<Date | Date[] | undefined | null | string>(undefined);
-    const [paymentDueDate, setPaymentDueDate] = useState<Date | Date[] | undefined | null | string>(undefined);
-    const [selectedProducts, setSelectedProducts] = useState<InvoiceProduct[]>([
-        { id: 1, productName: "Produkts 1", quantity: 1, price: 2, unit: "kg", invoiceId: 1 }
-    ]);
     const { user } = useUser();
+
+    const formik = useFormik<IInvoice>({
+        initialValues: {
+            dateDelivered: "",
+            datePaymentDue: "",
+            customerId: 0,
+            driverId: 0,
+            transportId: 0,
+            products: []
+        },
+        validate: (data) => {
+            let errors = {} as any;
+
+            if (!data.dateDelivered) {
+                errors.dateDelivered = "Izvēlieties piegādes datumu.";
+            }
+            if (!data.datePaymentDue) {
+                errors.datePaymentDue = "Izvēlieties maksājuma termiņu.";
+            }
+            if (!data.customerId) {
+                errors.customerId = "Izvēlieties klientu.";
+            }
+            if (!data.driverId) {
+                errors.driverId = "Izvēlieties vadītāju.";
+            }
+            if (!data.transportId) {
+                errors.transportId = "Izvēlieties transportu.";
+            }
+            if (!data.products.length) {
+                errors.products = "Izvēlieties produktus.";
+            }
+
+            return errors;
+        },
+        onSubmit: (data) => {
+            onInvoiceSave(data);
+        }
+    });
+
+    const isFormFieldValid = (name: keyof typeof formik.touched) => !!(formik.touched[name] && formik.errors[name]);
+    const getFormErrorMessage = (name: keyof typeof formik.touched) => {
+        //@ts-expect-error
+        return isFormFieldValid(name) && <small className="p-error">{formik.errors[name]}</small>;
+    };
 
     const confirm = () => {
         confirmDialog({
-            message: 'Vai tiešām vēlaties atcelt?',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Jā',
-            rejectLabel: 'Nē',
+            message: "Vai tiešām vēlaties atcelt?",
+            icon: "pi pi-exclamation-triangle",
+            acceptLabel: "Jā",
+            rejectLabel: "Nē",
             accept: props.toggleItemForm
         });
     };
 
-    function onInvoiceSave() {
+    function onInvoiceSave(data: IInvoice) {
         props.saveInvoice({
             dateCreated: new Date().toISOString(),
-            dateDelivered: deliveryDate as string,
-            datePaymentDue: paymentDueDate as string,
+            dateDelivered: data.dateDelivered,
+            datePaymentDue: data.datePaymentDue,
             status: "UNSIGNED",
-            customerId: selectedCustomer.id,
-            driverId: selectedDriver.id,
-            transportId: selectedTransport.id,
+            customerId: data.customerId,
+            driverId: data.driverId,
+            transportId: data.transportId,
             createdBy: user?.name as string,
-            products: selectedProducts
+            products: data.products
         });
         props.toggleItemForm();
     }
-
-    const onCustomerChange = (e: { value: any }) => {
-        setSelectedCustomer(e.value);
-    };
-
-    const onTransportChange = (e: { value: any }) => {
-        setSelectedTransport(e.value);
-    };
-
-    const onDriverChange = (e: { value: any }) => {
-        setSelectedDriver(e.value);
-    };
 
     const quantityEditor = (options: ColumnEditorOptions) => {
         return (
@@ -76,13 +101,13 @@ function CreateInvoice(props: ICreateInvoiceProps) {
         );
     };
 
-    const onRowEditComplete = (e: any) => {
-        let _products = [...selectedProducts];
+    const onRowEditComplete = (e: DataTableRowEditCompleteParams) => {
+        let products = [...formik.values.products];
         let { newData, index } = e;
 
-        _products[index] = newData;
+        products[index] = newData;
 
-        setSelectedProducts(_products);
+        formik.setFieldValue("products", products);
     };
 
     const productsEditor = (options: ColumnEditorOptions) => {
@@ -105,113 +130,149 @@ function CreateInvoice(props: ICreateInvoiceProps) {
             />
         );
     };
-
     return (
         <>
-            <ConfirmDialog />
-            <div className="create-invoice-container">
-                <div className="form-content">
-                    <div className="form-selector-container">
-                        <div className="form-dropdown-selectors">
-                            <div className="form-item customer-select">
-                                <Dropdown
-                                    value={selectedCustomer}
-                                    options={props.customers}
-                                    onChange={onCustomerChange}
-                                    optionLabel="clientName"
-                                    filter
-                                    showClear
-                                    filterBy="clientName"
-                                    placeholder="Izvēlaties klientu"
-                                    style={{ width: "18rem" }}
-                                />
+            <form onSubmit={formik.handleSubmit} className="p-fluid">
+                <div className="create-invoice-container">
+                    <div className="form-content">
+                        <div className="form-selector-container">
+                            <div className="form-dropdown-selectors">
+                                <div className="form-item customer-select">
+                                    <Dropdown
+                                        id="customerId"
+                                        value={formik.values.customerId}
+                                        options={props.customers.map((c) => {
+                                            return { label: c.clientName, value: c.id };
+                                        })}
+                                        onChange={formik.handleChange}
+                                        optionLabel="label"
+                                        filter
+                                        showClear
+                                        filterBy="label"
+                                        placeholder="Izvēlaties klientu"
+                                        style={{ width: "18rem" }}
+                                    />
+                                    <label
+                                        htmlFor="clientName"
+                                        className={classNames({ "p-error": isFormFieldValid("customerId") })}
+                                    ></label>
+                                    {getFormErrorMessage("customerId")}
+                                </div>
+                                <div className="form-item transport-select">
+                                    <Dropdown
+                                        id="transportId"
+                                        value={formik.values.transportId}
+                                        options={props.transports.map((c) => {
+                                            return { label: c.name, value: c.id };
+                                        })}
+                                        onChange={formik.handleChange}
+                                        optionLabel="label"
+                                        filter
+                                        showClear
+                                        filterBy="label"
+                                        placeholder="Izvēlaties transportu"
+                                        style={{ width: "18rem" }}
+                                    />
+                                    <label
+                                        htmlFor="transportId"
+                                        className={classNames({ "p-error": isFormFieldValid("transportId") })}
+                                    ></label>
+                                    {getFormErrorMessage("transportId")}
+                                </div>
+                                <div className="form-item driver-select">
+                                    <Dropdown
+                                        id="driverId"
+                                        value={formik.values.driverId}
+                                        options={props.drivers.map((c) => {
+                                            return { label: c.name, value: c.id };
+                                        })}
+                                        onChange={formik.handleChange}
+                                        optionLabel="label"
+                                        filter
+                                        showClear
+                                        filterBy="label"
+                                        placeholder="Izvēlaties vadītāju"
+                                        style={{ width: "18rem" }}
+                                    />
+                                    <label
+                                        htmlFor="driverId"
+                                        className={classNames({ "p-error": isFormFieldValid("driverId") })}
+                                    ></label>
+                                    {getFormErrorMessage("driverId")}
+                                </div>
                             </div>
-                            <div className="form-item transport-select">
-                                <Dropdown
-                                    value={selectedTransport}
-                                    options={props.transports}
-                                    onChange={onTransportChange}
-                                    optionLabel="name"
-                                    filter
-                                    showClear
-                                    filterBy="name"
-                                    placeholder="Izvēlaties transportu"
-                                    style={{ width: "18rem" }}
-                                />
-                            </div>
-                            <div className="form-item driver-select">
-                                <Dropdown
-                                    value={selectedDriver}
-                                    options={props.drivers}
-                                    onChange={onDriverChange}
-                                    optionLabel="name"
-                                    filter
-                                    showClear
-                                    filterBy="name"
-                                    placeholder="Izvēlaties vadītāju"
-                                    style={{ width: "18rem" }}
-                                />
+                            <div className="form-calendar-selectors">
+                                <div className="form-item delivery-date">
+                                    <span className="p-float-label">
+                                        <Calendar
+                                            style={{ width: "18rem" }}
+                                            dateFormat="dd/mm/yy"
+                                            id="dateDelivered"
+                                            value={formik.values.dateDelivered}
+                                            onChange={formik.handleChange}
+                                        />
+                                        <label
+                                            htmlFor="dateDelivered"
+                                            className={classNames({ "p-error": isFormFieldValid("dateDelivered") })}
+                                        >
+                                            Piegādes datums
+                                        </label>
+                                        {getFormErrorMessage("dateDelivered")}
+                                    </span>
+                                </div>
+                                <div className="form-item payment-due-date">
+                                    <span className="p-float-label">
+                                        <Calendar
+                                            style={{ width: "18rem" }}
+                                            dateFormat="dd/mm/yy"
+                                            id="datePaymentDue"
+                                            value={formik.values.datePaymentDue}
+                                            onChange={formik.handleChange}
+                                        />
+                                        <label
+                                            htmlFor="datePaymentDue"
+                                            className={classNames({ "p-error": isFormFieldValid("datePaymentDue") })}
+                                        >
+                                            Maksājuma termiņš
+                                        </label>
+                                        {getFormErrorMessage("datePaymentDue")}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                        <div className="form-calendar-selectors">
-                            <div className="form-item delivery-date">
-                                <span className="p-float-label">
-                                    <Calendar
-                                        style={{ width: "18rem" }}
-                                        required
-                                        dateFormat="dd/mm/yy"
-                                        id="basic"
-                                        value={deliveryDate}
-                                        onChange={(e) => setDeliveryDate(e.value)}
-                                    />
-                                    <label htmlFor="calendar">Piegādes datums</label>
-                                </span>
-                            </div>
-                            <div className="form-item payment-due-date">
-                                <span className="p-float-label">
-                                    <Calendar
-                                        style={{ width: "18rem" }}
-                                        required
-                                        dateFormat="dd/mm/yy"
-                                        id="basic"
-                                        value={paymentDueDate}
-                                        onChange={(e) => setPaymentDueDate(e.value)}
-                                    />
-                                    <label htmlFor="calendar">Maksājuma termiņš</label>
-                                </span>
-                            </div>
-                        </div>
+                        <DataTable
+                            id="products"
+                            style={{ width: "90%" }}
+                            className="editable-cells-table"
+                            editMode="row"
+                            value={[
+                                ...formik.values.products,
+                                { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
+                            ]}
+                            onRowEditComplete={onRowEditComplete}
+                        >
+                            <Column
+                                editor={(options) => productsEditor(options)}
+                                field="productName"
+                                header="Produkta nosaukums"
+                            />
+                            <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
+                            <Column
+                                rowEditor
+                                headerStyle={{ width: "10%", minWidth: "8rem" }}
+                                bodyStyle={{ textAlign: "center" }}
+                            ></Column>
+                        </DataTable>
+                        {getFormErrorMessage("products")}
                     </div>
-                    <DataTable
-                        style={{ width: "90%" }}
-                        className="editable-cells-table"
-                        editMode="row"
-                        value={[
-                            ...selectedProducts,
-                            { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
-                        ]}
-                        onRowEditComplete={onRowEditComplete}
-                    >
-                        <Column
-                            editor={(options) => productsEditor(options)}
-                            field="productName"
-                            header="Produkta nosaukums"
-                        />
-                        <Column editor={(options) => quantityEditor(options)} field="quantity" header="Skaits" />
-                        <Column
-                            rowEditor
-                            headerStyle={{ width: "10%", minWidth: "8rem" }}
-                            bodyStyle={{ textAlign: "center" }}
-                        ></Column>
-                    </DataTable>
+                    <div className="form-footer">
+                        <span className="p-buttonset">
+                            <Button type="submit" label="Saglabāt" icon="pi pi-save" />
+                            <Button type="button" onClick={confirm} label="Atcelt" icon="pi pi-times" />
+                        </span>
+                    </div>
                 </div>
-                <div className="form-footer">
-                    <span className="p-buttonset">
-                        <Button onClick={onInvoiceSave} label="Saglabāt" icon="pi pi-save" />
-                        <Button onClick={confirm} label="Atcelt" icon="pi pi-times" />
-                    </span>
-                </div>
-            </div>
+            </form>
         </>
     );
 }

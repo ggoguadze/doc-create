@@ -32,7 +32,7 @@ function billDetail({ bill, user }: { bill: BillWithData; user: User[] }) {
                     <div className="logo">
                         <img src="/logo.png" alt="logo" />
                     </div>
-                    <div className="date-created">{new Date(bill.dateCreated).toLocaleString()}</div>
+                    <div className="date-created">{new Date(bill.dateCreated).toLocaleDateString()}</div>
                     <div className="bill-number">
                         <h3>Rēķins</h3> Nr. {bill.id.toString().padStart(4, "0")}
                     </div>
@@ -82,16 +82,20 @@ function billDetail({ bill, user }: { bill: BillWithData; user: User[] }) {
                         <h6>
                             PVN 21%:{" "}
                             {(
-                                bill.billProducts.reduce((total, product) => total + product.quantity * product.price, 0) *
-                                0.21
+                                bill.billProducts.reduce(
+                                    (total, product) => total + product.quantity * product.price,
+                                    0
+                                ) * 0.21
                             ).toFixed(2)}{" "}
                             Eur
                         </h6>
                         <h6>
                             Summa apmaksai:{" "}
                             {(
-                                bill.billProducts.reduce((total, product) => total + product.quantity * product.price, 0) *
-                                1.21
+                                bill.billProducts.reduce(
+                                    (total, product) => total + product.quantity * product.price,
+                                    0
+                                ) * 1.21
                             ).toFixed(2)}{" "}
                             Eur
                         </h6>
@@ -103,7 +107,7 @@ function billDetail({ bill, user }: { bill: BillWithData; user: User[] }) {
                         <h6>Izsniedza</h6>
                         <h6>Vārds, uzvārds: {bill.createdBy}</h6>
                         <h6>Paraksts: {bill.status === "SIGNED" ? "PARAKSTĪTS" : ""}</h6>
-                        <h6>Datums: </h6>
+                        <h6>Datums: {new Date(bill.dateCreated).toLocaleDateString()} </h6>
                     </div>
                     <Divider layout="vertical" />
                     <div className="issued-to">
