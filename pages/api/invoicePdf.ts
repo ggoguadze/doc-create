@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const page = await context.newPage()
     await page.emulateMedia({media:'screen'})
     const id = JSON.parse(req.body)
-    await page.goto(`http://localhost:3000/invoice/${id}`)
+    await page.goto(`http://doc-create.vercel.app/invoice/${id}`)
     
     await page.getByText('Pavadzīme').isVisible()
       const pdfBuffer = await page.pdf({ format: 'A4' })
