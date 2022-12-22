@@ -7,7 +7,6 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 const Nav = () => {
     const router = useRouter();
     const { user } = useUser();
-    console.log(user);
     return (
         <>
             <ConfirmDialog />

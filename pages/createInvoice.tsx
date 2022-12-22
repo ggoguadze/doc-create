@@ -110,7 +110,6 @@ function createInvoice({
     function downloadInvoices(pdfs: Blob[]) {
         for (const [i, pdf] of pdfs.entries()) {
             const url = URL.createObjectURL(pdf);
-            console.log(url, " url");
             const a = document.createElement("a");
             a.setAttribute(
                 "download",
@@ -157,7 +156,6 @@ function createInvoice({
     }
 
     async function deleteInvoice(id: number) {
-        console.log(id, " id");
         const response = await fetch("/api/invoice", {
             method: "DELETE",
             body: JSON.stringify(id)

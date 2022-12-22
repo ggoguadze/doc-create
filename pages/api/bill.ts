@@ -10,6 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         res.json(savedBill)
     } else if (req.method === "DELETE") {
         const id = JSON.parse(req.body)
+        await prisma.billProduct.deleteMany({where: {billId: id}})
         const deletedBill = await prisma.bill.delete({ where: { id: id } })
         res.json(deletedBill)
     } else if (req.method === "PATCH"){

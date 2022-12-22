@@ -37,16 +37,18 @@ model Products {
 }
 
 model Driver {
-  id      Int       @id @default(autoincrement())
-  name    String
-  invoice Invoice[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  invoice   Invoice[]
+  isDeleted Boolean   @default(false)
 }
 
 model Transport {
-  id      Int       @id @default(autoincrement())
-  name    String
-  number  String
-  invoice Invoice[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  number    String
+  invoice   Invoice[]
+  isDeleted Boolean   @default(false)
 }
 
 model User {
