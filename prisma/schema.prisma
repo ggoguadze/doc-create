@@ -1,9 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 generator client {
@@ -14,7 +12,6 @@ generator dbml {
   provider = "prisma-dbml-generator"
 }
 
-// Rename to LegalEntity
 model Customer {
   id             Int       @id @default(autoincrement())
   email          String    @unique
@@ -75,6 +72,10 @@ model Invoice {
   transportId     Int
   status          String
   createdBy       String
+
+  @@index([customerId])
+  @@index([driverId])
+  @@index([transportId])
 }
 
 model Bill {
@@ -86,6 +87,8 @@ model Bill {
   customerId     Int
   status         String
   createdBy      String
+
+  @@index([customerId])
 }
 
 model InvoiceProduct {
@@ -96,6 +99,8 @@ model InvoiceProduct {
   unit        String
   invoice     Invoice @relation(fields: [invoiceId], references: [id])
   invoiceId   Int
+
+  @@index([invoiceId])
 }
 
 model BillProduct {
@@ -106,4 +111,6 @@ model BillProduct {
   unit        String
   bill        Bill   @relation(fields: [billId], references: [id])
   billId      Int
+
+  @@index([billId])
 }

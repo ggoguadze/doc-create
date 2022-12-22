@@ -13,6 +13,7 @@ Table Customer {
   bankName String [not null]
   invoice Invoice [not null]
   bill Bill [not null]
+  isDeleted Boolean [not null, default: false]
 }
 
 Table Products {
@@ -26,6 +27,7 @@ Table Driver {
   id Int [pk, increment]
   name String [not null]
   invoice Invoice [not null]
+  isDeleted Boolean [not null, default: false]
 }
 
 Table Transport {
@@ -33,6 +35,7 @@ Table Transport {
   name String [not null]
   number String [not null]
   invoice Invoice [not null]
+  isDeleted Boolean [not null, default: false]
 }
 
 Table User {
