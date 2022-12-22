@@ -190,7 +190,7 @@ function createInvoice({
                         onClick={() => {
                             signInvoice();
                         }}
-                        label="Lejupielādēt parakstītās"
+                        label="Lejupielādēt pavadzīmes"
                         icon="pi pi-download"
                     />
                 )}

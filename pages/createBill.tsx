@@ -179,7 +179,7 @@ function createBill({
                         onClick={() => {
                             signBill();
                         }}
-                        label="Lejupielādēt parakstītās"
+                        label="Lejupielādēt rēķinus"
                         icon="pi pi-download"
                     />
                 )}
