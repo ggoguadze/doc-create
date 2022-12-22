@@ -1,7 +1,6 @@
 import { Button } from "primereact/button";
 import { IBill, IFullBill } from "../pages/createBill";
-import { Customer, Products, BillProduct } from "@prisma/client";
-import { useState } from "react";
+import { Customer, Products } from "@prisma/client";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { Calendar } from "primereact/calendar";
 import { DataTable, DataTableRowEditCompleteParams } from "primereact/datatable";
@@ -89,6 +88,12 @@ function CreateBill(props: ICreateBillProps) {
         let products = [...formik.values.products];
         let { newData, index } = e;
 
+        newData = {
+            ...newData,
+            price: props.products.find((p) => p.name === newData.productName)?.price,
+            unit: props.products.find((p) => p.name === newData.productName)?.unit
+        };
+
         products[index] = newData;
 
         formik.setFieldValue("products", products);
@@ -163,10 +168,7 @@ function CreateBill(props: ICreateBillProps) {
                             id="products"
                             className="editable-cells-table"
                             editMode="row"
-                            value={[
-                                ...formik.values.products,
-                                { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
-                            ]}
+                            value={[...formik.values.products, { productName: "", quantity: 0, price: 0, unit: "" }]}
                             onRowEditComplete={onRowEditComplete}
                             style={{ width: "90%" }}
                         >

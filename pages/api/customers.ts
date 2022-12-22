@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         res.json(savedCustomer)
     } else if (req.method === "DELETE") {
         const id = JSON.parse(req.body)
-        const deletedCustomer = await prisma.customer.delete({ where: { id: id } })
+        const deletedCustomer = await prisma.customer.update({ where: { id: id }, data: { isDeleted: true } })
         res.json(deletedCustomer)
     } else if (req.method === 'PATCH') {
         const body = JSON.parse(req.body)

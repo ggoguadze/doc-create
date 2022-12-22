@@ -14,7 +14,7 @@ export interface IDriver {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-    const drivers = await prisma.driver.findMany();
+    const drivers = await prisma.driver.findMany({ where: { isDeleted: false } });
 
     return { props: { drivers } };
 };

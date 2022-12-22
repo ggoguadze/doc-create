@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         res.json(savedTransport)
     } else if (req.method === "DELETE") {
         const id = JSON.parse(req.body)
-        const deletedTransport = await prisma.transport.delete({ where: { id: id } })
+        const deletedTransport = await prisma.transport.update({ where: { id: id }, data: { isDeleted: true } })
         res.json(deletedTransport)
     } else if (req.method === 'PATCH') {
         const body = JSON.parse(req.body)

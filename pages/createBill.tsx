@@ -29,7 +29,7 @@ interface IBillProduct {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({ where: { isDeleted: false } });
     const products = await prisma.products.findMany();
     const bill = await prisma.bill.findMany({
         include: {

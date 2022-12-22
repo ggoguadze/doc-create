@@ -33,10 +33,10 @@ interface IInvoiceProduct {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({ where: { isDeleted: false } });
     const products = await prisma.products.findMany();
-    const drivers = await prisma.driver.findMany();
-    const transports = await prisma.transport.findMany();
+    const drivers = await prisma.driver.findMany({ where: { isDeleted: false } });
+    const transports = await prisma.transport.findMany({ where: { isDeleted: false } });
     const invoice = await prisma.invoice.findMany({
         include: {
             customer: true

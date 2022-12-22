@@ -105,6 +105,12 @@ function CreateInvoice(props: ICreateInvoiceProps) {
         let products = [...formik.values.products];
         let { newData, index } = e;
 
+        newData = {
+            ...newData,
+            price: props.products.find((p) => p.name === newData.productName)?.price,
+            unit: props.products.find((p) => p.name === newData.productName)?.unit
+        };
+
         products[index] = newData;
 
         formik.setFieldValue("products", products);
@@ -245,10 +251,7 @@ function CreateInvoice(props: ICreateInvoiceProps) {
                             style={{ width: "90%" }}
                             className="editable-cells-table"
                             editMode="row"
-                            value={[
-                                ...formik.values.products,
-                                { id: 0, productName: "", quantity: 0, price: 0, unit: "", invoiceId: 0 }
-                            ]}
+                            value={[...formik.values.products, { productName: "", quantity: 0, price: 0, unit: "" }]}
                             onRowEditComplete={onRowEditComplete}
                         >
                             <Column

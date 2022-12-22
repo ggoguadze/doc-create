@@ -20,7 +20,7 @@ export interface ICustomer {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({ where: { isDeleted: false } });
     return { props: { customers } };
 };
 
@@ -89,6 +89,8 @@ function clients({ customers }: { customers: Customer[] }) {
             body: JSON.stringify(id)
         });
 
+        console.log(response);
+
         if (!response.ok) {
             throw new Error(response.statusText);
         }
@@ -128,7 +130,14 @@ function clients({ customers }: { customers: Customer[] }) {
                 <Column field="pvnCode" header="PVN kods"></Column>
                 <Column field="account" header="Konta numurs"></Column>
             </DataTable>
-            <Dialog blockScroll={true} draggable={false} closable={false} visible={displayModal} onHide={toggleItemForm} closeOnEscape={false}>
+            <Dialog
+                blockScroll={true}
+                draggable={false}
+                closable={false}
+                visible={displayModal}
+                onHide={toggleItemForm}
+                closeOnEscape={false}
+            >
                 <CustomerEdit selectedData={customerEdit} toggleItemForm={toggleItemForm} saveCustomer={saveCustomer} />
             </Dialog>
         </div>

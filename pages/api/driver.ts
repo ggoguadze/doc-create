@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         res.json(savedDriver)
     } else if (req.method === "DELETE") {
         const id = JSON.parse(req.body)
-        const deletedDriver = await prisma.driver.delete({ where: { id: id } })
+        const deletedDriver = await prisma.driver.update({ where: { id: id }, data: { isDeleted: true } })
         res.json(deletedDriver)
     } else if (req.method === 'PATCH') {
         const body = JSON.parse(req.body)

@@ -15,7 +15,7 @@ export interface ITransport {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-    const transports = await prisma.transport.findMany();
+    const transports = await prisma.transport.findMany({ where: { isDeleted: false } });
     return { props: { transports } };
 };
 
