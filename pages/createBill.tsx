@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { prisma } from "../prisma";
 import { Customer, Products, Bill } from "@prisma/client";
 import { useRouter } from "next/router";
@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CreateBill from "../components/CreateBill";
+import { Toast } from "primereact/toast";
 
 export interface IBill {
     datePaymentDue: string;
@@ -53,6 +54,8 @@ function createBill({
     const [displayBillModal, setDisplayBillModal] = useState(false);
     const [displaySigningModal, setDisplaySigningModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedBillId, setSelectedBillId] = useState(0);
+    const billToast = useRef(null as any);
 
     useEffect(() => {
         if (displaySigningModal) {
@@ -63,15 +66,43 @@ function createBill({
     }, [displaySigningModal]);
 
     function toggleBillItemForm() {
+        if (!customers || !products) {
+            showError();
+            return;
+        }
         setDisplayBillModal(!displayBillModal);
     }
 
-    function toggleSigningModal() {
+    const showError = () => {
+        if (!billToast.current) {
+            return;
+        }
+        let msg: string = "";
+        if (!customers) {
+            msg = msg + "Sistēmā nav klienti ";
+        }
+        if (!products && msg.length === 0) {
+            msg = msg + `Sistēmā nav produkti. `;
+        } else if (!products) {
+            msg = msg + `\nSistēmā nav produkti. `;
+        }
+        billToast.current.show({ severity: "error", summary: "Kļūda", detail: msg, life: 3000 });
+    };
+
+    function toggleSigningModal(id?: number) {
+        if (id) {
+            setSelectedBillId(id);
+        }
         setDisplaySigningModal(!displaySigningModal);
     }
 
     function closeSigningModal() {
         setDisplaySigningModal(false);
+        if (selectedBillId) {
+            updateSingleBillStatus(selectedBillId);
+            setSelectedBillId(0);
+            return;
+        }
         updateBillStatus();
     }
 
@@ -144,6 +175,19 @@ function createBill({
         return await response.json().then(() => refreshPage());
     }
 
+    async function updateSingleBillStatus(id: number) {
+        const response = await fetch("/api/bill", {
+            method: "PATCH",
+            body: JSON.stringify({ id, status: "SIGNED" })
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
     async function deleteBill(id: number) {
         const response = await fetch("/api/bill", {
             method: "DELETE",
@@ -163,6 +207,7 @@ function createBill({
 
     return (
         <>
+            <Toast ref={billToast} />
             <span className="p-buttonset">
                 <Button onClick={toggleBillItemForm} label="Jauns rēķins" icon="pi pi-file" />
                 {bill.some((b) => b.status === "UNSIGNED") && (
@@ -174,15 +219,14 @@ function createBill({
                         icon="pi pi-pencil"
                     />
                 )}
-                {bill.some((b) => b.status === "SIGNED") && (
-                    <Button
-                        onClick={() => {
-                            signBill();
-                        }}
-                        label="Lejupielādēt rēķinus"
-                        icon="pi pi-download"
-                    />
-                )}
+
+                <Button
+                    onClick={() => {
+                        signBill();
+                    }}
+                    label="Lejupielādēt rēķinus"
+                    icon="pi pi-download"
+                />
             </span>
 
             <DataTable dataKey="id" selectionMode="single" value={bill}>
@@ -228,6 +272,13 @@ function createBill({
                     body={(bill: BillWithCustomer) => {
                         return (
                             <span className="p-buttonset">
+                                {bill.status === "UNSIGNED" && (
+                                    <Button
+                                        onClick={() => toggleSigningModal(bill.id)}
+                                        label="Parakstīt"
+                                        icon="pi pi-pencil"
+                                    />
+                                )}
                                 <Button onClick={() => previewDocument(bill.id)} label="Apskatīt" icon="pi pi-file" />
                                 <Button onClick={() => deleteBill(bill.id)} label="Dzēst" icon="pi pi-trash" />
                             </span>

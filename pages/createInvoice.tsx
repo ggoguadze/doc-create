@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { prisma } from "../prisma";
 import { Driver, Transport, Customer, Products, Invoice } from "@prisma/client";
 import { useRouter } from "next/router";
@@ -9,6 +9,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CreateInvoice from "../components/CreateInvoice";
 import { useEffect } from "react";
+import { Toast } from "primereact/toast";
 
 export interface IInvoice {
     dateDelivered: string;
@@ -63,6 +64,8 @@ function createInvoice({
     const [displayInvoiceModal, setDisplayInvoiceModal] = useState(false);
     const [displaySigningModal, setDisplaySigningModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState(0);
+    const invoiceToast = useRef(null as any);
 
     useEffect(() => {
         if (displaySigningModal) {
@@ -73,15 +76,53 @@ function createInvoice({
     }, [displaySigningModal]);
 
     function toggleInvoiceItemForm() {
+        if (!customers || !products || !drivers || !transports) {
+            showError();
+            return;
+        }
         setDisplayInvoiceModal(!displayInvoiceModal);
     }
 
-    function toggleSigningModal() {
+    const showError = () => {
+        if (!invoiceToast.current) {
+            return;
+        }
+        let msg: string = "";
+        if (!customers) {
+            msg = msg + "Sistēmā nav klienti ";
+        }
+        if (!products && msg.length === 0) {
+            msg = msg + `Sistēmā nav produkti. `;
+        } else if (!products) {
+            msg = msg + `\nSistēmā nav produkti. `;
+        }
+        if (!drivers && msg.length === 0) {
+            msg = msg + "Sistēmā nav vadītāji . ";
+        } else if (!drivers) {
+            msg = msg + `\nSistēmā nav vadītāji . `;
+        }
+        if (!transports && msg.length === 0) {
+            msg = msg + "Sistēmā nav transportlīdzekļi. ";
+        } else if (!transports) {
+            msg = msg + `\nSistēmā nav transportlīdzekļi. `;
+        }
+        invoiceToast.current.show({ severity: "error", summary: "Kļūda", detail: msg, life: 3000 });
+    };
+
+    function toggleSigningModal(id?: number) {
+        if (id) {
+            setSelectedInvoiceId(id);
+        }
         setDisplaySigningModal(!displaySigningModal);
     }
 
     function closeSigningModal() {
         setDisplaySigningModal(false);
+        if (selectedInvoiceId) {
+            updateSingleInvoiceStatus(selectedInvoiceId);
+            setSelectedInvoiceId(0);
+            return;
+        }
         updateInvoiceStatus();
     }
 
@@ -155,6 +196,19 @@ function createInvoice({
         return await response.json().then(() => refreshPage());
     }
 
+    async function updateSingleInvoiceStatus(id: number) {
+        const response = await fetch("/api/invoice", {
+            method: "PATCH",
+            body: JSON.stringify({ id, status: "SIGNED" })
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json().then(() => refreshPage());
+    }
+
     async function deleteInvoice(id: number) {
         const response = await fetch("/api/invoice", {
             method: "DELETE",
@@ -174,6 +228,7 @@ function createInvoice({
 
     return (
         <>
+            <Toast ref={invoiceToast} />
             <span className="p-buttonset">
                 <Button onClick={toggleInvoiceItemForm} label="Jauna pavadzīme" icon="pi pi-file" />
                 {invoice.some((inv) => inv.status === "UNSIGNED") && (
@@ -185,15 +240,14 @@ function createInvoice({
                         icon="pi pi-pencil"
                     />
                 )}
-                {invoice.some((inv) => inv.status === "SIGNED") && (
-                    <Button
-                        onClick={() => {
-                            signInvoice();
-                        }}
-                        label="Lejupielādēt pavadzīmes"
-                        icon="pi pi-download"
-                    />
-                )}
+
+                <Button
+                    onClick={() => {
+                        signInvoice();
+                    }}
+                    label="Lejupielādēt pavadzīmes"
+                    icon="pi pi-download"
+                />
             </span>
 
             <DataTable dataKey="id" selectionMode="single" value={invoice}>
@@ -239,6 +293,13 @@ function createInvoice({
                     body={(invoice: InvoiceWithCustomer) => {
                         return (
                             <span className="p-buttonset">
+                                {invoice.status === "UNSIGNED" && (
+                                    <Button
+                                        onClick={() => toggleSigningModal(invoice.id)}
+                                        label="Parakstīt"
+                                        icon="pi pi-pencil"
+                                    />
+                                )}
                                 <Button
                                     onClick={() => previewDocument(invoice.id)}
                                     label="Apskatīt"
